@@ -39,12 +39,25 @@
           outlined
           label="Add Layer"
           append-outer-icon="mdi-plus-box"
-        ></v-text-field>
-        <v-treeview
-          rounded
-          hoverable
-          activatable
-         :items="items"></v-treeview>
+        ></v-text-field> 
+          <v-treeview
+            v-model="tree"
+            :open="initiallyOpen"
+            :items="items"
+            activatable
+            rounded
+            item-key="name"
+            open-on-click
+          >
+            <template #prepend="{ item, open }">
+              <v-icon v-if="!item.file">
+                {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+              </v-icon>
+              <v-icon v-else>
+                {{ files[item.file] }}
+              </v-icon>
+            </template>
+          </v-treeview>
         </v-container>
         </v-card>
          <v-card 
@@ -78,80 +91,52 @@
   </v-container> 
 </template>
 
-<script>
+ <script>
   export default {
     data: () => ({
-      items: [
+      initiallyOpen: ['public'],
+      files: {  
+        png: 'mdi-file-image',
+        txt: 'mdi-file-document-outline', 
+      },
+      tree: [],
+      items: [ 
         {
-          id: 1,
-          name: 'Face :',
+          name: 'Face',
           children: [
-            { id: 2, name: 'Calendar : app' },
-            { id: 3, name: 'Chrome : app' },
-            { id: 4, name: 'Webstorm : app' },
+             {
+                name: 'logo.png',
+                file: 'png',
+              }
           ],
-        },
-        {
-          id: 5,
-          name: 'Eyes :',
+        }, 
+         {
+          name: 'Mouth',
           children: [
-            {
-              id: 6,
-              name: 'vuetify :',
-              children: [
-                {
-                  id: 7,
-                  name: 'src :',
-                  children: [
-                    { id: 8, name: 'index : ts' },
-                    { id: 9, name: 'bootstrap : ts' },
-                  ],
-                },
-              ],
-            },
-            {
-              id: 10,
-              name: 'Nose :',
-              children: [
-                {
-                  id: 11,
-                  name: 'src :',
-                  children: [
-                    { id: 12, name: 'v-btn : ts' },
-                    { id: 13, name: 'v-card : ts' },
-                    { id: 14, name: 'v-window : ts' },
-                  ],
-                },
-              ],
-            },
+             {
+                name: 'logo.png',
+                file: 'png',
+              }
           ],
-        },
-        {
-          id: 15,
-          name: 'Hair :',
+        }, 
+         {
+          name: 'Nose',
           children: [
-            { id: 16, name: 'October : pdf' },
-            { id: 17, name: 'November : pdf' },
-            { id: 18, name: 'Tutorial : html' },
+             {
+                name: 'logo.png',
+                file: 'png',
+              }
           ],
-        },
-        {
-          id: 19,
-          name: 'Arms :',
+        }, 
+         {
+          name: 'Teeth',
           children: [
-            {
-              id: 20,
-              name: 'Tutorials :',
-              children: [
-                { id: 21, name: 'Basic layouts : mp4' },
-                { id: 22, name: 'Advanced techniques : mp4' },
-                { id: 23, name: 'All about app : dir' },
-              ],
-            },
-            { id: 24, name: 'Intro : mov' },
-            { id: 25, name: 'Conference introduction : avi' },
+             {
+                name: 'logo.png',
+                file: 'png',
+              }
           ],
-        },
+        }, 
       ],
     }),
   }
