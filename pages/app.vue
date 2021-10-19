@@ -6,7 +6,7 @@
         sm="6"
         md="8"
       > 
-        <v-row>
+        <v-row class="pa-3">
          <v-file-input
             label="Upload Images Folders" 
             filled
@@ -28,12 +28,47 @@
         lg="4"
       >
       <v-card
-        class="pa-2 rounded"  
+        class="rounded"  
         tile
       >
+        <v-container>
+        <h4 class="py-3">
           Layers
-          <v-treeview :items="items"></v-treeview>
+        </h4> 
+        <v-text-field
+          outlined
+          label="Add Layer"
+          append-outer-icon="mdi-plus-box"
+        ></v-text-field>
+        <v-treeview :items="items"></v-treeview>
+        </v-container>
         </v-card>
+         <v-card 
+            elevation="2"
+            outlined 
+            hover
+            class="my-3"
+            style="border-radius: 0.5em"
+            >
+          
+        <v-card-title>
+          Layer Settings
+           
+        </v-card-title>
+        <v-container>
+           <v-text-field
+            v-model="message4"
+            label="face"
+            outlined
+            clearable
+          ></v-text-field>
+          <v-slider
+              v-model="max"
+              label="Rarity (100%)"
+          >
+          </v-slider>
+        </v-container>
+      </v-card>
       </v-col>
     </v-row>
   </v-container> 
