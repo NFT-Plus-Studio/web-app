@@ -40,7 +40,11 @@
           label="Add Layer"
           append-outer-icon="mdi-plus-box"
         ></v-text-field>
-        <v-treeview :items="items"></v-treeview>
+        <v-treeview
+          rounded
+          hoverable
+          activatable
+         :items="items"></v-treeview>
         </v-container>
         </v-card>
          <v-card 
