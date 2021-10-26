@@ -58,7 +58,7 @@
               <v-icon v-if="!item.file" @click="setTitle(item.name)">
                 {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
               </v-icon>
-              <v-icon v-else>
+              <v-icon v-else @click="setPictureName(item.name)">
                 {{ files[item.file] }}
               </v-icon>
             </template>
@@ -80,13 +80,21 @@
         <v-container>
            <v-text-field
             v-model="layerTitle"
-            label="layerTitle" 
+            label="Layer Title" 
             outlined
             clearable
           ></v-text-field>
+          <v-text-field
+            v-model="pictureName"
+            label="Picture Name" 
+            outlined
+            clearable
+            @keydown.enter="updatePictureName()"
+          ></v-text-field>
           <v-slider
               v-model="rarity"
-              label="Rarity (100%)"
+              label="Rarity (100%)" 
+              @change="updatePictureName()"
           >
           </v-slider>
         </v-container>
@@ -107,6 +115,7 @@
         txt: 'mdi-file-document-outline', 
       },
       layerTitle: '',
+      pictureName: '',
       rarity: 50,
       imageUploads: [],
       tree: [],
@@ -153,6 +162,9 @@
       setTitle(title) {
         this.layerTitle = title;
       },
+      setPictureName(name){ 
+        this.pictureName = name;
+      },
       layerExists(){
         return true
       },
@@ -168,13 +180,25 @@
       },
       onImageUpload(e) { 
         const files = e;
-        files.forEach(file => {
-          // this.createImage(file);
+        files.forEach(file => { 
           this.imageUploads.push({
             name: this.layerTitle + file.name.split('.').shift() + '#'  + this.rarity + '.' + file.type.replace('image/', ''),
             file:  file.name.split('.').pop()
           }) 
         }) 
+      },
+      updatePictureName() { 
+        this.items.forEach(image => { 
+          if(image.name === this.layerTitle) {
+            if(image.children) { 
+              image.children.forEach(child => {
+                child.name = '';
+                child.name = this.layerTitle + child.name.split('.').shift() + '#'  + this.rarity + '.' + child.file; 
+                this.setPictureName(child.name);
+              })
+            }
+          } 
+        })
       }
     }
   }
