@@ -30,8 +30,8 @@
           class="px-4"
         >
           <v-text-field
-            v-model="name"
-            :counter="10"
+            v-model="collectionConfig.name"
+            :counter="12"
             :rules="nameRules"
             label="Project Name"
             required
@@ -40,7 +40,7 @@
           ></v-text-field>
 
           <v-text-field
-            v-model="email"
+            v-model="collectionConfig.description"
             :rules="emailRules"
             label="Project Description"
             required
@@ -60,7 +60,7 @@
           <v-row >
             <v-col>
               <v-text-field
-                v-model="numberValue"
+                v-model="collectionConfig.maxY"
                 hide-details
                 single-line
                 label="900"
@@ -71,7 +71,7 @@
             </v-col>
             <v-col>
             <v-text-field
-              v-model="numberValue"
+              v-model="collectionConfig.maxX"
               hide-details
               single-line
               label="900"
@@ -156,8 +156,18 @@
 export default {
   data () {
     return {
-      clipped: false,
-      drawer: false,
+      collectionConfig: {
+        name: 'My First NFT',
+        description: '',
+        collectionSize: 0,
+        shuffleLayerConfigurations: false,
+        layerOrder: [],
+        maxY: 900,
+        maxX: 900,
+        uniqeness: 100
+      },
+      clipped: true,
+      drawer: true,
       fixed: false,
       items: [
         {
