@@ -192,9 +192,11 @@
           if(image.name === this.layerTitle) {
             if(image.children) { 
               image.children.forEach(child => {
-                child.name = '';
-                child.name = this.layerTitle + child.name.split('.').shift() + '#'  + this.rarity + '.' + child.file; 
-                this.setPictureName(child.name);
+                if(child.name === this.pictureName) {
+                  child.name = '';
+                  child.name = this.layerTitle + child.name.split('.').shift() + '#'  + this.rarity + '.' + child.file; 
+                  this.setPictureName(child.name);
+                }
               })
             }
           } 
