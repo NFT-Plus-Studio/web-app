@@ -2,3 +2,9 @@
 //
 // The variables you want to modify
 // $font-size-root: 20px;
+$app-bar-elevation: 5;
+@import '~vuetify/src/styles/styles.sass';
+
+.v-main__wrap {
+    background: #120458;
+}
