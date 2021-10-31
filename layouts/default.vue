@@ -110,6 +110,21 @@
           >
             Reset
           </v-btn>
+
+          <v-btn
+            class="mt-4"
+            :loading="loading"
+            :disabled="loading"
+            color="info"
+            @click="loader = 'loading'"
+          >
+            Generate Collection
+            <template v-slot:loader>
+              <span class="custom-loader">
+                <v-icon light>mdi-cached</v-icon>
+              </span>
+            </template>
+          </v-btn>
         </v-form>
     </v-navigation-drawer>
     <v-app-bar
@@ -168,6 +183,8 @@ export default {
       },
       clipped: true,
       drawer: true,
+      loader: null,
+      loading: false,
       fixed: false,
       items: [
         {
@@ -186,6 +203,54 @@ export default {
       rightDrawer: false,
       title: 'NFT + Studio'
     }
+  },
+  watch: {
+    loader () {
+      const l = this.loader
+      this[l] = !this[l]
+
+      setTimeout(() => (this[l] = false), 3000)
+
+      this.loader = null
+    },
   }
 }
 </script>
+<style>
+  .custom-loader {
+    animation: loader 1s infinite;
+    display: flex;
+  }
+  @-moz-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-o-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
