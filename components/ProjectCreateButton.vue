@@ -2,7 +2,7 @@
     <div>
         <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn id="create-button" class="py-6" v-bind="attrs" v-on="on">
+                <v-btn id="create-button" class="py-5" v-bind="attrs" v-on="on">
                     Create
                     <v-icon right small color="white"> mdi-menu-down </v-icon>
                 </v-btn>

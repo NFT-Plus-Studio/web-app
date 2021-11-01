@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="dashboard-header-container" class="mb-10">
+        <div id="dashboard-header-container" class="mb-5">
             <h1 class="text-h5">Dashboard</h1>
             <ProjectCreateButton />
         </div>

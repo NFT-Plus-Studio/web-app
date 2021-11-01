@@ -17,11 +17,11 @@
             <v-list class="px-20">
                 <v-list-item-group v-model="selectedItem">
                     <v-list-item v-for="(item, index) in items" :key="index">
-                        <v-list-item-conten>
+                        <v-list-item-content>
                             <v-list-item-title>{{
                                 item.title
                             }}</v-list-item-title>
-                        </v-list-item-conten>
+                        </v-list-item-content>
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
