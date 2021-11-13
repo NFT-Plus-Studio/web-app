@@ -8,6 +8,9 @@ $slider-track-width: 6px;
 $slider-track-border-radius: 6px;
 $slider-tick-border-radius: 6px;
 
+$list-item-title-font-size: 0.8rem;
+$list-item-min-height: 40px;
+
 @import '~vuetify/src/styles/styles.sass';
 
 .v-main__wrap {

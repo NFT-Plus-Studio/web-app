@@ -11,7 +11,9 @@
                     v-on="on"
                 >
                     <img src="~/assets/images/logo.png" width="159.77" />
-                    <v-icon right large color="white"> mdi-menu-down </v-icon>
+                    <v-icon class="ml-1" small color="white">
+                        mdi-menu-down
+                    </v-icon>
                 </v-btn>
             </template>
             <v-list class="px-20">
