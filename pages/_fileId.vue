@@ -63,17 +63,19 @@
                 </v-list>
                 <v-divider class="my-3" />
                 <div class="d-flex justify-space-between mt-8">
-                    <v-btn outlined id="preview-btn">Preview</v-btn>
+                    <v-btn
+                        id="preview-btn"
+                        outlined
+                        @click.stop="openPreviewModal"
+                        >Preview</v-btn
+                    >
                     <v-btn id="generate-btn">Generate</v-btn>
                 </div>
             </div>
         </v-col>
         <v-col cols="6">
             <div class="d-flex flex-wrap">
-                <DropFilesZone
-                    class="mb-3"
-                    @:files-selected="onFilesSelected"
-                />
+                <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
                 <div
                     v-for="(trait, index) in selectedLayer.traits"
                     :key="index"
@@ -190,6 +192,7 @@
                 </div>
             </div>
         </v-col>
+        <NFTCollectionPreviewModal />
     </v-row>
 </template>
 
@@ -198,25 +201,31 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'underscore';
 
+// TODO: move to mixin
 interface FileInfo {
     name: string;
     type: string;
     size: string;
 }
 
+// TODO: move to mixin
 interface TraitProps {
     name: string;
     rarity: string | number;
     file: File | null;
     fileInfo: FileInfo | null;
     base64Image: string;
+    image: HTMLImageElement;
     selected: boolean;
 }
+
+// TODO: move to mixin
 interface LayerProps {
     title: string;
     traits: Array<TraitProps>;
     selected: boolean;
 }
+
 const traitTemplate: TraitProps = {
     name: '',
     rarity: '100',
@@ -224,6 +233,7 @@ const traitTemplate: TraitProps = {
     fileInfo: null,
     selected: false,
     base64Image: '',
+    image: new Image(),
 };
 
 const layerTemplate: LayerProps = {
@@ -243,18 +253,21 @@ export default class NFTGeneratorEditor extends Vue {
 
     newLayerName: string = '';
 
-    layers: any[] = [
+    layers: LayerProps[] = [
         {
             title: 'Background',
             traits: [],
             selected: true,
         },
-        { title: 'Body', traits: [], selected: false },
     ];
 
     asyncData({ params }: any) {
         const slug = params.fileId;
         return { slug };
+    }
+
+    openPreviewModal() {
+        this.$root.$emit('open-nft-collection-preview-modal', this.layers);
     }
 
     addNewLayer() {
@@ -285,6 +298,7 @@ export default class NFTGeneratorEditor extends Vue {
         };
         try {
             newTrait.base64Image = await this.getBase64(file);
+            newTrait.image = await this.getBase64AsImage(newTrait.base64Image);
         } catch (err) {
             // TODO: add toast error message here
             console.log('Error adding new trait: ', err);
@@ -310,7 +324,19 @@ export default class NFTGeneratorEditor extends Vue {
         });
     }
 
+    getBase64AsImage(base64: string): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = function () {
+                resolve(image);
+            };
+            image.onerror = (error) => reject(error);
+            image.src = base64;
+        });
+    }
+
     onFilesSelected(fileList: FileList) {
+        console.log('File list: ', fileList);
         for (let i = 0; i < fileList.length; i++) {
             this.addNewTrait(fileList.item(i));
         }
