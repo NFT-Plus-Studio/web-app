@@ -32,6 +32,7 @@
                                 x-small
                                 icon
                                 color="red lighten-2"
+                                @click="deleteLayer(layer.title)"
                             >
                                 <v-icon x-small>mdi-close</v-icon>
                             </v-btn>
@@ -47,7 +48,7 @@
                             type="text"
                             background-color="rgba(255, 254, 254, 0.08)"
                         >
-                            <template v-slot:append-outer>
+                            <template #append-outer>
                                 <v-btn
                                     elevation="0"
                                     color="rgba(255,255,255,0.08)"
@@ -76,6 +77,7 @@
         <v-col cols="6">
             <div class="d-flex flex-wrap">
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
+                <div v-if="selectedLayer">
                 <div
                     v-for="(trait, index) in selectedLayer.traits"
                     :key="index"
@@ -92,6 +94,7 @@
                         x-small
                         icon
                         color="red lighten-2"
+                        @click="deleteTrait(trait.name)"
                     >
                         <v-icon x-small>mdi-close</v-icon>
                     </v-btn>
@@ -103,6 +106,7 @@
                         :src="trait.base64Image"
                     ></v-img>
                     <p>{{ trait.name }}</p>
+                </div>
                 </div>
             </div>
         </v-col>
@@ -283,6 +287,10 @@ export default class NFTGeneratorEditor extends Vue {
         this.onLayerSelected(this.layers.length - 1);
     }
 
+    deleteLayer(title: string) {
+        this.layers = this.layers.filter(l => l.title !== title);
+    }
+
     async addNewTrait(file: File | null): Promise<void> {
         if (!file) {
             return;
@@ -307,6 +315,14 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.selected = true;
         }
         this.selectedLayer.traits.push(newTrait);
+    }
+
+    deleteTrait(traitName: string) {
+        this.layers = this.layers.map((l) => {
+            l.traits = l.traits.filter(t => t.name !== traitName);
+            return l;
+        });
+
     }
 
     // TODO: move to mixin
@@ -349,14 +365,14 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     get selectedTrait() {
-        if (this.selectedLayer.traits.length === 0) {
+        if (this.selectedLayer?.traits.length === 0) {
             return null;
         }
         const currentIndex = _.findIndex(
-            this.selectedLayer.traits,
+            this.selectedLayer?.traits,
             (t: any) => t.selected
         );
-        return this.selectedLayer.traits[this.indexFound(currentIndex) || 0];
+        return this.selectedLayer?.traits[this.indexFound(currentIndex) || 0];
     }
 
     selectTrait(newSelectedIndex: number) {
@@ -365,9 +381,8 @@ export default class NFTGeneratorEditor extends Vue {
             (t: any) => t.selected
         );
 
-        this.selectedLayer.traits[this.indexFound(currentIndex) || 0].selected =
-            false;
-        this.selectedLayer.traits[newSelectedIndex].selected = true;
+        this.selectedLayer.traits[this.indexFound(currentIndex) || 0]?.selected = false;
+        this.selectedLayer.traits[newSelectedIndex]?.selected = true;
     }
 
     // TODO: move to mixin

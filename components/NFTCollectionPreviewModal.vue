@@ -14,8 +14,9 @@
             </v-app-bar>
 
             <v-alert v-if="errorFound" type="error">
-                I'm an error alert.
+                {{ errorMessage }}
             </v-alert>
+
             <div v-if="!errorFound" class="preview-container px-5 py-2">
                 <v-row
                     v-if="isLoading"
@@ -25,13 +26,19 @@
                     justify="center"
                 >
                     <v-col cols="12" class="text-center">
-                        <!-- <v-progress-circular
+                        <v-progress-circular
                             indeterminate
                             color="green"
-                        ></v-progress-circular> -->
+                        ></v-progress-circular>
                     </v-col>
                 </v-row>
-                <div v-else>Loaded</div>
+
+                <div
+                    v-else
+                    class="d-flex text-center justify-center align-center"
+                >
+                    <v-img :src="previewImage" contain max-width="380" />
+                </div>
             </div>
         </v-card>
     </v-dialog>
@@ -41,6 +48,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'underscore';
+import axios from '~/plugins/axios';
 
 @Component
 export default class NFTCollectionPreviewModal extends Vue {
@@ -48,21 +56,67 @@ export default class NFTCollectionPreviewModal extends Vue {
     rawLayers!: any[];
     isLoading: boolean = true;
     errorFound: boolean = false;
+    errorMessage: string = '';
+    previewImage: string = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA';
 
     created() {
         this.$root.$on('open-nft-collection-preview-modal', this.openModal);
     }
 
     openModal(layers: any[]) {
-        this.showModal = true;
+        this.reset();
         this.rawLayers = layers;
         this.getPreview();
+        this.showModal = true;
     }
 
-    getPreview() {
-        let selectedData: any = this.selectRandomDataForPreview();
-        selectedData = this.parseLayersToApiData(selectedData);
-        console.log(selectedData);
+    reset() {
+        this.isLoading = true;
+        this.errorFound = false;
+        this.errorMessage = '';
+    }
+
+    async getPreview() {
+        this.reset();
+        try {
+            let selectedData: any = this.selectRandomDataForPreview();
+            selectedData = this.parseLayersToApiData(selectedData);
+            if (selectedData.files.length < 4) {
+                throw new Error(
+                    'You must have provide at least two (2) layers with at least two(2) traits each.'
+                );
+            }
+
+            const bodyFormData = new FormData();
+            bodyFormData.append(
+                'collectionConfig',
+                JSON.stringify(selectedData.collectionConfig)
+            );
+
+            for (const file of selectedData.files) {
+                bodyFormData.append('images', file);
+            }
+
+            try {
+                const response = await axios({
+                    url: '/preview',
+                    method: 'POST',
+                    data: bodyFormData,
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+
+                this.isLoading = false;
+                this.previewImage = response.data.data;
+            } catch (err: any) {
+                console.log('Error from api: ', err);
+                throw new Error('Something went wrong.');
+            }
+        } catch (err: any) {
+            console.log('Error: ', err);
+            this.errorFound = true;
+            this.isLoading = false;
+            this.errorMessage = err.message;
+        }
     }
 
     selectRandomDataForPreview(): any[] {
@@ -75,15 +129,16 @@ export default class NFTCollectionPreviewModal extends Vue {
     }
 
     // TODO: move to mixin
-    parseLayersToApiData(layers: any[]): { data: {}; files: File[] } {
-        const data = {
-            collectionConfig: {
-                collectionSize: 4,
-                layersOrder: _.pluck(layers, 'title'),
-                shuffleLayerConfigurations: false,
-                description: 'Preview',
-                userEmailAddress: 'preview@sample.com',
-            },
+    parseLayersToApiData(layers: any[]): {
+        collectionConfig: {};
+        files: File[];
+    } {
+        const collectionConfig = {
+            collectionSize: 4,
+            layersOrder: _.pluck(layers, 'title'),
+            shuffleLayerConfigurations: false,
+            description: 'Preview',
+            userEmailAddress: 'preview@sample.com',
         };
 
         const files: File[] = [];
@@ -98,7 +153,7 @@ export default class NFTCollectionPreviewModal extends Vue {
         }
 
         return {
-            data,
+            collectionConfig,
             files,
         };
     }
