@@ -19,6 +19,7 @@
 
             <div v-if="!errorFound" class="preview-container px-5 py-2">
                 <v-row
+                    v-if="isLoading"
                     class="fill-height"
                     align-content="center"
                     align="center"
@@ -26,18 +27,18 @@
                 >
                     <v-col cols="12" class="text-center">
                         <v-progress-circular
-                            v-if="isLoading"
                             indeterminate
                             color="green"
                         ></v-progress-circular>
-                        <v-img
-                            v-else
-                            :src="previewImage"
-                            contain
-                            max-width="380"
-                        />
                     </v-col>
                 </v-row>
+
+                <div
+                    v-else
+                    class="d-flex text-center justify-center align-center"
+                >
+                    <v-img :src="previewImage" contain max-width="380" />
+                </div>
             </div>
         </v-card>
     </v-dialog>
