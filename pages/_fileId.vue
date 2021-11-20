@@ -32,6 +32,7 @@
                                 x-small
                                 icon
                                 color="red lighten-2"
+                                @click="deleteLayer(layer.title)"
                             >
                                 <v-icon x-small>mdi-close</v-icon>
                             </v-btn>
@@ -281,6 +282,10 @@ export default class NFTGeneratorEditor extends Vue {
         this.layers.push(newLayer);
         this.newLayerName = '';
         this.onLayerSelected(this.layers.length - 1);
+    }
+
+    deleteLayer(title: string) {
+        this.layers = this.layers.filter(l => l.title !== title);
     }
 
     async addNewTrait(file: File | null): Promise<void> {
