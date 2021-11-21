@@ -76,36 +76,34 @@
         <v-col cols="6">
             <div class="d-flex flex-wrap">
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
-                <div v-if="selectedLayer">
-                    <div
-                        v-for="(trait, index) in selectedLayer.traits"
-                        :key="index"
-                        :class="{
-                            'pink-item-border': trait.selected,
-                        }"
-                        class="layer-thumbnail-container pa-2 mt-3 mx-2"
-                        @click="selectTrait(index)"
+                <div
+                    v-for="(trait, index) in selectedLayer.traits"
+                    :key="index"
+                    :class="{
+                        'pink-item-border': trait.selected,
+                    }"
+                    class="layer-thumbnail-container pa-2 mt-3 mx-2"
+                    @click="selectTrait(index)"
+                >
+                    <v-btn
+                        v-if="trait.selected"
+                        class="close-btn item-close-btn ma-2"
+                        text
+                        x-small
+                        icon
+                        color="red lighten-2"
+                        @click="deleteTrait(trait.name)"
                     >
-                        <v-btn
-                            v-if="trait.selected"
-                            class="close-btn item-close-btn ma-2"
-                            text
-                            x-small
-                            icon
-                            color="red lighten-2"
-                            @click="deleteTrait(trait.name)"
-                        >
-                            <v-icon x-small>mdi-close</v-icon>
-                        </v-btn>
-                        <v-img
-                            class="mb-1"
-                            width="76"
-                            height="72"
-                            contain
-                            :src="trait.base64Image"
-                        ></v-img>
-                        <p>{{ trait.name }}</p>
-                    </div>
+                        <v-icon x-small>mdi-close</v-icon>
+                    </v-btn>
+                    <v-img
+                        class="mb-1"
+                        width="76"
+                        height="72"
+                        contain
+                        :src="trait.base64Image"
+                    ></v-img>
+                    <p>{{ trait.name }}</p>
                 </div>
             </div>
         </v-col>
