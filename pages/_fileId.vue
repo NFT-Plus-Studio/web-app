@@ -31,7 +31,7 @@
                                 x-small
                                 icon
                                 color="red lighten-2"
-                                @click="deleteLayer(layer.title)"
+                                @click="deleteLayer(index)"
                             >
                                 <v-icon x-small>mdi-close</v-icon>
                             </v-btn>
@@ -76,7 +76,7 @@
         <v-col cols="6">
             <div class="d-flex flex-wrap">
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
-                <div v-if="selectedLayer">
+                <template v-if="selectedLayer">
                     <div
                         v-for="(trait, index) in selectedLayer.traits"
                         :key="index"
@@ -93,7 +93,7 @@
                             x-small
                             icon
                             color="red lighten-2"
-                            @click="deleteTrait(trait.name)"
+                            @click="deleteTrait(index)"
                         >
                             <v-icon x-small>mdi-close</v-icon>
                         </v-btn>
@@ -106,7 +106,7 @@
                         ></v-img>
                         <p>{{ trait.name }}</p>
                     </div>
-                </div>
+                </template>
             </div>
         </v-col>
         <v-col cols="3">
@@ -289,9 +289,8 @@ export default class NFTGeneratorEditor extends Vue {
         this.onLayerSelected(this.layers.length - 1);
     }
 
-    deleteLayer(title: string) {
-        // TODO: remove by id
-        this.layers = this.layers.filter(l => l.title !== title);
+    deleteLayer(index: number) {
+        this.layers.splice(index,1);
         this.onLayerSelected(this.layers.length - 1);
     }
 
@@ -322,8 +321,8 @@ export default class NFTGeneratorEditor extends Vue {
         this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
-    deleteTrait(traitName: string) {
-        this.selectedLayer.traits = this.selectedLayer.traits.filter((t: TraitProps) => t.name !== traitName);
+    deleteTrait(index: number) {
+        this.selectedLayer.traits.splice(index,1);
         this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
