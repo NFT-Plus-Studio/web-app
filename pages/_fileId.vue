@@ -26,13 +26,12 @@
                                 </v-col>
                             </v-row>
                             <v-btn
-                                v-if="layer.selected"
                                 class="layer-close-btn item-close-btn ma-2"
                                 text
                                 x-small
                                 icon
                                 color="red lighten-2"
-                                @click="deleteLayer(layer.title)"
+                                @click="deleteLayer(index)"
                             >
                                 <v-icon x-small>mdi-close</v-icon>
                             </v-btn>
@@ -77,7 +76,7 @@
         <v-col cols="6">
             <div class="d-flex flex-wrap">
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
-                <div v-if="selectedLayer">
+                <template v-if="selectedLayer">
                     <div
                         v-for="(trait, index) in selectedLayer.traits"
                         :key="index"
@@ -94,7 +93,7 @@
                             x-small
                             icon
                             color="red lighten-2"
-                            @click="deleteTrait(trait.name)"
+                            @click="deleteTrait(index)"
                         >
                             <v-icon x-small>mdi-close</v-icon>
                         </v-btn>
@@ -107,7 +106,7 @@
                         ></v-img>
                         <p>{{ trait.name }}</p>
                     </div>
-                </div>
+                </template>
             </div>
         </v-col>
         <v-col cols="3">
@@ -282,13 +281,17 @@ export default class NFTGeneratorEditor extends Vue {
 
         const newLayer: LayerProps = JSON.parse(JSON.stringify(layerTemplate));
         newLayer.title = this.newLayerName.trim();
+        if(this.layers.length === 0) {
+            newLayer.selected = true;
+        }
         this.layers.push(newLayer);
         this.newLayerName = '';
         this.onLayerSelected(this.layers.length - 1);
     }
 
-    deleteLayer(title: string) {
-        this.layers = this.layers.filter((l) => l.title !== title);
+    deleteLayer(index: number) {
+        this.layers.splice(index,1);
+        this.onLayerSelected(this.layers.length - 1);
     }
 
     async addNewTrait(file: File | null): Promise<void> {
@@ -315,13 +318,12 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.selected = true;
         }
         this.selectedLayer.traits.push(newTrait);
+        this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
-    deleteTrait(traitName: string) {
-        this.layers = this.layers.map((l) => {
-            l.traits = l.traits.filter((t) => t.name !== traitName);
-            return l;
-        });
+    deleteTrait(index: number) {
+        this.selectedLayer.traits.splice(index,1);
+        this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
     // TODO: move to mixin
@@ -359,8 +361,13 @@ export default class NFTGeneratorEditor extends Vue {
 
     onLayerSelected(i: number) {
         const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
-        this.layers[this.indexFound(currentIndex) || 0].selected = false;
-        this.layers[i || 0].selected = true;
+        if(currentIndex > -1) {
+            this.layers[this.indexFound(currentIndex) || 0].selected = false;
+        }
+
+        if(this.layers[i || 0]) {
+            this.layers[i || 0].selected = true;
+        }
     }
 
     get selectedTrait() {
@@ -380,10 +387,10 @@ export default class NFTGeneratorEditor extends Vue {
             (t: any) => t.selected
         );
 
-        this.selectedLayer.traits[
-            this.indexFound(currentIndex) || 0
-        ].selected! = false;
-        this.selectedLayer.traits[newSelectedIndex].selected! = true;
+        if(this.selectedLayer.traits[newSelectedIndex]) {
+            this.selectedLayer.traits[this.indexFound(currentIndex) || 0].selected = false;
+            this.selectedLayer.traits[newSelectedIndex].selected = true;
+        }
     }
 
     // TODO: move to mixin
