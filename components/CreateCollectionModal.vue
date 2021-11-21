@@ -13,15 +13,34 @@
                 </v-btn>
             </v-app-bar>
             <div class="px-5 pt-2 pb-4">
-                <v-text-field label="Title" outlined></v-text-field>
-                <v-textarea
-                    outlined
-                    name="input-7-4"
-                    label="Description"
-                ></v-textarea>
-                <div class="d-flex justify-center">
-                    <v-btn dark id="create-button" class="py-5">Create</v-btn>
-                </div>
+                <v-form
+                    ref="form"
+                    v-model="form.valid"
+                    @submit.prevent="onSubmit"
+                >
+                    <v-text-field
+                        v-model="form.fields.title"
+                        label="Title"
+                        :rules="form.rules.title"
+                        outlined
+                    ></v-text-field>
+                    <v-textarea
+                        v-model="form.fields.description"
+                        :rules="form.rules.description"
+                        outlined
+                        label="Description"
+                    ></v-textarea>
+                    <div class="d-flex justify-center">
+                        <v-btn
+                            id="create-button"
+                            type="submit"
+                            :disabled="!form.valid"
+                            dark
+                            class="py-5"
+                            >Create</v-btn
+                        >
+                    </div>
+                </v-form>
             </div>
         </v-card>
     </v-dialog>
@@ -31,9 +50,61 @@
 import Vue from 'vue';
 import { Component, PropSync, Watch } from 'vue-property-decorator';
 
+// TODO: move to mixin
+export interface FormDefinition {
+    valid: boolean;
+    fields: {
+        [key: string]: any;
+    };
+    rules?: {
+        [key: string]: any;
+    };
+}
+
+// TODO: move to a mixin
+function requiredRule(
+    message = 'This field must be filled'
+): (value: any) => boolean | string {
+    return (value) => !!value || value === 0 || message;
+}
+
+function minCharacterRule(
+    message = 'This field must contain at least 5 characters'
+): (value: any) => boolean | string {
+    return (value) => value.length >= 5 || message;
+}
+
+interface Form extends FormDefinition {
+    fields: {
+        title: string;
+        description: string;
+    };
+    rules: {
+        title: ((message?: string) => {})[];
+        description: ((message?: string) => {})[];
+    };
+}
+
 @Component
 export default class CreateCollectionModal extends Vue {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
+
+    form: Form = {
+        valid: false,
+        fields: {
+            title: '',
+            description: '',
+        },
+        rules: {
+            title: [requiredRule(), minCharacterRule()],
+            description: [requiredRule(), minCharacterRule()],
+        },
+    };
+
+    onSubmit() {
+        // TODO: implement this method
+        console.log('Submits :) ');
+    }
 
     @Watch('showModal')
     onShowModalChanged(val: boolean) {
@@ -42,7 +113,9 @@ export default class CreateCollectionModal extends Vue {
         }
 
         // reset stuff here
-        console.log('Modal changed');
+        this.form.fields.title = '';
+        this.form.fields.description = '';
+        this.form.valid = false;
     }
 }
 </script>
