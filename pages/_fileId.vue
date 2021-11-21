@@ -318,6 +318,7 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.selected = true;
         }
         this.selectedLayer.traits.push(newTrait);
+        this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
     deleteTrait(traitName: string) {
