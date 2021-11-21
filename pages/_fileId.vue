@@ -78,35 +78,35 @@
             <div class="d-flex flex-wrap">
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
                 <div v-if="selectedLayer">
-                <div
-                    v-for="(trait, index) in selectedLayer.traits"
-                    :key="index"
-                    :class="{
-                        'pink-item-border': trait.selected,
-                    }"
-                    class="layer-thumbnail-container pa-2 mt-3 mx-2"
-                    @click="selectTrait(index)"
-                >
-                    <v-btn
-                        v-if="trait.selected"
-                        class="close-btn item-close-btn ma-2"
-                        text
-                        x-small
-                        icon
-                        color="red lighten-2"
-                        @click="deleteTrait(trait.name)"
+                    <div
+                        v-for="(trait, index) in selectedLayer.traits"
+                        :key="index"
+                        :class="{
+                            'pink-item-border': trait.selected,
+                        }"
+                        class="layer-thumbnail-container pa-2 mt-3 mx-2"
+                        @click="selectTrait(index)"
                     >
-                        <v-icon x-small>mdi-close</v-icon>
-                    </v-btn>
-                    <v-img
-                        class="mb-1"
-                        width="76"
-                        height="72"
-                        contain
-                        :src="trait.base64Image"
-                    ></v-img>
-                    <p>{{ trait.name }}</p>
-                </div>
+                        <v-btn
+                            v-if="trait.selected"
+                            class="close-btn item-close-btn ma-2"
+                            text
+                            x-small
+                            icon
+                            color="red lighten-2"
+                            @click="deleteTrait(trait.name)"
+                        >
+                            <v-icon x-small>mdi-close</v-icon>
+                        </v-btn>
+                        <v-img
+                            class="mb-1"
+                            width="76"
+                            height="72"
+                            contain
+                            :src="trait.base64Image"
+                        ></v-img>
+                        <p>{{ trait.name }}</p>
+                    </div>
                 </div>
             </div>
         </v-col>
@@ -288,7 +288,7 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteLayer(title: string) {
-        this.layers = this.layers.filter(l => l.title !== title);
+        this.layers = this.layers.filter((l) => l.title !== title);
     }
 
     async addNewTrait(file: File | null): Promise<void> {
@@ -319,10 +319,9 @@ export default class NFTGeneratorEditor extends Vue {
 
     deleteTrait(traitName: string) {
         this.layers = this.layers.map((l) => {
-            l.traits = l.traits.filter(t => t.name !== traitName);
+            l.traits = l.traits.filter((t) => t.name !== traitName);
             return l;
         });
-
     }
 
     // TODO: move to mixin
@@ -381,8 +380,10 @@ export default class NFTGeneratorEditor extends Vue {
             (t: any) => t.selected
         );
 
-        this.selectedLayer.traits[this.indexFound(currentIndex) || 0]?.selected = false;
-        this.selectedLayer.traits[newSelectedIndex]?.selected = true;
+        this.selectedLayer.traits[
+            this.indexFound(currentIndex) || 0
+        ].selected! = false;
+        this.selectedLayer.traits[newSelectedIndex].selected! = true;
     }
 
     // TODO: move to mixin

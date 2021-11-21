@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-menu offset-y light>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
                 <v-btn id="create-button" class="py-5" v-bind="attrs" v-on="on">
                     Create
                     <v-icon right small color="white"> mdi-menu-down </v-icon>
@@ -13,9 +13,10 @@
                         <v-list-item
                             v-for="(item, index) in items"
                             :key="index"
+                            @click="item.action"
                         >
                             <v-list-item-icon>
-                                <v-icon v-text="item.icon" small></v-icon>
+                                <v-icon small v-text="item.icon"></v-icon>
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title>{{
@@ -27,16 +28,33 @@
                 </v-list>
             </v-card>
         </v-menu>
+        <CreateCollectionModal
+            :show-modal.sync="showCreateCollectionModalFlag"
+        />
     </div>
 </template>
 
-<script>
-export default {
-    data: () => ({
-        selectedItem: 0,
-        items: [{ title: 'Collection', icon: 'mdi-image-multiple' }],
-    }),
-};
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+
+@Component
+export default class ProjectCreateButton extends Vue {
+    selectedItem = 0;
+    showCreateCollectionModalFlag: boolean = false;
+
+    showCreateCollectionModal() {
+        this.showCreateCollectionModalFlag = true;
+    }
+
+    items = [
+        {
+            title: 'Collection',
+            icon: 'mdi-image-multiple',
+            action: this.showCreateCollectionModal,
+        },
+    ];
+}
 </script>
 
 <style lang="scss" scoped>
