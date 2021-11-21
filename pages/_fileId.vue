@@ -290,6 +290,7 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteLayer(title: string) {
+        // TODO: remove by id
         this.layers = this.layers.filter((l) => l.title !== title);
         this.onLayerSelected(this.layers.length - 1);
     }
@@ -322,10 +323,7 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteTrait(traitName: string) {
-        this.layers = this.layers.map((l) => {
-            l.traits = l.traits.filter((t) => t.name !== traitName);
-            return l;
-        });
+        this.selectedLayer.traits = this.selectedLayer.traits.filter((t: TraitProps) => t.name !== traitName);
         this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
