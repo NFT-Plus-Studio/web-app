@@ -326,6 +326,7 @@ export default class NFTGeneratorEditor extends Vue {
             l.traits = l.traits.filter((t) => t.name !== traitName);
             return l;
         });
+        this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
     // TODO: move to mixin
