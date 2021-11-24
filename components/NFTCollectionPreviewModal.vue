@@ -87,6 +87,8 @@ export default class NFTCollectionPreviewModal extends Vue {
                 );
             }
 
+            console.log('Selcted Data: ', selectedData);
+
             const bodyFormData = new FormData();
             bodyFormData.append(
                 'collectionConfig',
@@ -135,7 +137,9 @@ export default class NFTCollectionPreviewModal extends Vue {
     } {
         const collectionConfig = {
             collectionSize: 4,
-            layersOrder: _.pluck(layers, 'title'),
+            layersOrder: _.map(layers, (layer) =>
+                layer.title.replace('_', ' ')
+            ),
             shuffleLayerConfigurations: false,
             description: 'Preview',
             userEmailAddress: 'preview@sample.com',
@@ -146,7 +150,9 @@ export default class NFTCollectionPreviewModal extends Vue {
         for (const layer of layers) {
             for (const trait of layer.traits) {
                 const fileType = trait.fileInfo.type.split('/')[1];
-                const modifiedFileName = `${layer.title}_${trait.name}#${trait.rarity}.${fileType}`;
+                const modifiedFileName = `${layer.title.replace('_', ' ')}_${
+                    trait.name
+                }#${trait.rarity}.${fileType}`;
                 const newFile = new File([trait.file], modifiedFileName);
                 files.push(newFile);
             }

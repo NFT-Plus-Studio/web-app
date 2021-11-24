@@ -69,7 +69,11 @@
                         @click.stop="openPreviewModal"
                         >Preview</v-btn
                     >
-                    <v-btn id="generate-btn">Generate</v-btn>
+                    <v-btn
+                        id="generate-btn"
+                        @click.stop="showGenerateCollectionModalFlag = true"
+                        >Generate</v-btn
+                    >
                 </div>
             </div>
         </v-col>
@@ -196,6 +200,12 @@
             </div>
         </v-col>
         <NFTCollectionPreviewModal />
+        <GenerateCollectionModal
+            :show-modal.sync="showGenerateCollectionModalFlag"
+            :layer-data.sync="layers"
+            :title.sync="collectionSettings.title"
+            :description.sync="collectionSettings.description"
+        />
     </v-row>
 </template>
 
@@ -249,12 +259,8 @@ const layerTemplate: LayerProps = {
     layout: 'editor',
 })
 export default class NFTGeneratorEditor extends Vue {
-    get selectedLayer(): any {
-        const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
-        return this.layers[this.indexFound(currentIndex) || 0];
-    }
-
     newLayerName: string = '';
+    showGenerateCollectionModalFlag: boolean = false;
 
     layers: LayerProps[] = [
         {
@@ -264,9 +270,20 @@ export default class NFTGeneratorEditor extends Vue {
         },
     ];
 
+    // collection setting properties
+    collectionSettings = {
+        title: '',
+        description: '',
+    };
+
     asyncData({ params }: any) {
         const slug = params.fileId;
         return { slug };
+    }
+
+    get selectedLayer(): any {
+        const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
+        return this.layers[this.indexFound(currentIndex) || 0];
     }
 
     openPreviewModal() {
@@ -281,7 +298,7 @@ export default class NFTGeneratorEditor extends Vue {
 
         const newLayer: LayerProps = JSON.parse(JSON.stringify(layerTemplate));
         newLayer.title = this.newLayerName.trim();
-        if(this.layers.length === 0) {
+        if (this.layers.length === 0) {
             newLayer.selected = true;
         }
         this.layers.push(newLayer);
@@ -290,7 +307,7 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteLayer(index: number) {
-        this.layers.splice(index,1);
+        this.layers.splice(index, 1);
         this.onLayerSelected(this.layers.length - 1);
     }
 
@@ -322,7 +339,7 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteTrait(index: number) {
-        this.selectedLayer.traits.splice(index,1);
+        this.selectedLayer.traits.splice(index, 1);
         this.selectTrait(this.selectedLayer.traits.length - 1);
     }
 
@@ -353,7 +370,11 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     onFilesSelected(fileList: FileList) {
-        console.log('File list: ', fileList);
+        // don't add anything if no layer is selected
+        if (!this.selectedLayer) {
+            return;
+        }
+
         for (let i = 0; i < fileList.length; i++) {
             this.addNewTrait(fileList.item(i));
         }
@@ -361,11 +382,11 @@ export default class NFTGeneratorEditor extends Vue {
 
     onLayerSelected(i: number) {
         const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
-        if(currentIndex > -1) {
+        if (currentIndex > -1) {
             this.layers[this.indexFound(currentIndex) || 0].selected = false;
         }
 
-        if(this.layers[i || 0]) {
+        if (this.layers[i || 0]) {
             this.layers[i || 0].selected = true;
         }
     }
@@ -387,8 +408,10 @@ export default class NFTGeneratorEditor extends Vue {
             (t: any) => t.selected
         );
 
-        if(this.selectedLayer.traits[newSelectedIndex]) {
-            this.selectedLayer.traits[this.indexFound(currentIndex) || 0].selected = false;
+        if (this.selectedLayer.traits[newSelectedIndex]) {
+            this.selectedLayer.traits[
+                this.indexFound(currentIndex) || 0
+            ].selected = false;
             this.selectedLayer.traits[newSelectedIndex].selected = true;
         }
     }
