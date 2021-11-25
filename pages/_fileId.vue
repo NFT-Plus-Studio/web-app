@@ -5,7 +5,7 @@
                 <h3 class="text-h6 mb-3">Layers</h3>
                 <v-list class="layer-list" flat color="transparent">
                     <v-list-item-group @change="onLayerSelected">
-                        <Container @drop="onDrop">
+                        <Container v-if="layers.length > 0" @drop="onDrop">
                             <Draggable v-for="(layer, index) in layers" :key="index" class="layers-container">
                                 <v-list-item
                                     :class="{
