@@ -5,64 +5,68 @@
                 <h3 class="text-h6 mb-3">Layers</h3>
                 <v-list class="layer-list" flat color="transparent">
                     <v-list-item-group @change="onLayerSelected">
-                        <v-list-item
-                            v-for="(layer, index) in layers"
-                            :key="index"
-                            :class="{
-                                'pink-item-border': layer.selected,
-                            }"
-                        >
-                            <v-row align-content="center">
-                                <v-col cols="10" class="pa-0">
-                                    <span class="layer-name">{{
-                                        layer.name
-                                    }}</span>
-                                </v-col>
-                                <v-col cols="2">
-                                    <div class="layer-stats">
-                                        <!-- <span>50%</span> -->
-                                        <span>{{ layer.traits.length }}</span>
-                                    </div>
-                                </v-col>
-                            </v-row>
-                            <v-btn
-                                class="layer-close-btn item-close-btn ma-2"
-                                text
-                                x-small
-                                icon
-                                color="red lighten-2"
-                                @click="deleteLayer(index)"
+                        <Container @drop="onDrop">
+                            <Draggable v-for="(layer, index) in layers" :key="index" class="layers-container">
+                                <v-list-item
+                                    :class="{
+                                        'pink-item-border': layer.selected,
+                                    }"
+                                >
+                                    <v-row align-content="center">
+                                        <v-col cols="10" class="pa-0">
+                                            <span class="layer-name">{{
+                                                layer.name
+                                            }}</span>
+                                        </v-col>
+                                        <v-col cols="2">
+                                            <div class="layer-stats">
+                                                <!-- <span>50%</span> -->
+                                                <span>{{ layer.traits.length }}</span>
+                                            </div>
+                                        </v-col>
+                                    </v-row>
+                                    <v-btn
+                                        class="layer-close-btn item-close-btn ma-2"
+                                        text
+                                        x-small
+                                        icon
+                                        color="red lighten-2"
+                                        @click="deleteLayer(index)"
+                                    >
+                                        <v-icon x-small>mdi-close</v-icon>
+                                    </v-btn>
+                                </v-list-item>
+                            </Draggable>
+                        </Container>
+                    </v-list-item-group>
+                    <v-list-item-group class="layers-container">
+                        <v-list-item>
+                            <v-text-field
+                                v-model="newLayerName"
+                                outlined
+                                hide-details
+                                dense
+                                class="new-layer-input-container"
+                                type="text"
+                                background-color="rgba(255, 254, 254, 0.08)"
                             >
-                                <v-icon x-small>mdi-close</v-icon>
-                            </v-btn>
+                                <template #append-outer>
+                                    <v-btn
+                                        elevation="0"
+                                        color="rgba(255,255,255,0.08)"
+                                        class="px-0"
+                                        depressed
+                                        @click="addNewLayer"
+                                    >
+                                        <v-icon color="white">mdi-plus</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-text-field>
                         </v-list-item>
                     </v-list-item-group>
-                    <v-list-item>
-                        <v-text-field
-                            v-model="newLayerName"
-                            outlined
-                            hide-details
-                            dense
-                            class="new-layer-input-container"
-                            type="text"
-                            background-color="rgba(255, 254, 254, 0.08)"
-                        >
-                            <template #append-outer>
-                                <v-btn
-                                    elevation="0"
-                                    color="rgba(255,255,255,0.08)"
-                                    class="px-0"
-                                    depressed
-                                    @click="addNewLayer"
-                                >
-                                    <v-icon color="white">mdi-plus</v-icon>
-                                </v-btn>
-                            </template>
-                        </v-text-field>
-                    </v-list-item>
                 </v-list>
                 <v-divider class="my-3" />
-                <div class="d-flex justify-space-between mt-8">
+                <div class="d-flex justify-space-between mt-8 layers-container">
                     <v-btn
                         id="preview-btn"
                         outlined
@@ -212,6 +216,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
+import { Container, Draggable } from "vue-smooth-dnd"
 import _ from 'underscore';
 
 // TODO: move to mixin
@@ -257,6 +262,10 @@ const layerTemplate: LayerProps = {
 
 @Component({
     layout: 'editor',
+    components: {
+        Container,
+        Draggable
+    }
 })
 export default class NFTGeneratorEditor extends Vue {
     newLayerName: string = '';
@@ -279,6 +288,29 @@ export default class NFTGeneratorEditor extends Vue {
     get selectedLayer(): any {
         const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
         return this.layers[this.indexFound(currentIndex) || 0];
+    }
+
+    applyDrag(arr: any, dragResult: any) {
+        const { removedIndex, addedIndex, payload } = dragResult;
+        if (removedIndex === null && addedIndex === null) return arr;
+
+        const result = [...arr];
+        let itemToAdd = payload;
+
+        if (removedIndex !== null) {
+            itemToAdd = result.splice(removedIndex, 1)[0];
+        }
+
+        if (addedIndex !== null) {
+            result.splice(addedIndex, 0, itemToAdd);
+        }
+
+        return result;
+    }
+
+
+    onDrop(dropResult: any) {
+        this.layers = this.applyDrag(this.layers, dropResult);
     }
 
     openPreviewModal() {
@@ -597,6 +629,10 @@ export default class NFTGeneratorEditor extends Vue {
             right: $closeButtonPositionTop;
             top: $closeButtonPositionTop;
         }
+    }
+
+    .layers-container {
+        padding: 8px 8px 0 0;
     }
 
     .item-close-btn {
