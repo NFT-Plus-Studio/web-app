@@ -4,19 +4,26 @@ const localStoragePrefix = process.env.NUXT_ENV_STORAGE_PREFIX;
 const LocalStorageKeys = {
     PROJECTS: `${localStoragePrefix}_projects`,
     SELECTED_PROJECT_ID: `${localStoragePrefix}_selected-project-id`,
+    SELECT_PROJECT_INDEX: `${localStoragePrefix}_selected-project-index`,
 };
 
 export const state = () => ({
     projects: [],
     selectedProjectId: null,
+    selectProjectIndex: 0,
 });
 
 const saveProjectState = (projects) => {
     localStorage.setItem(LocalStorageKeys.PROJECTS, JSON.stringify(projects));
 };
 
-const saveSelectedProjectId = (projectId) => {
+const findSelectedProjectIndex = (id, projects) => {
+    return _.findIndex(projects, (project) => project.id === id);
+};
+
+const saveSelectedProject = (projectId, index) => {
     localStorage.setItem(LocalStorageKeys.SELECTED_PROJECT_ID, projectId);
+    localStorage.setItem(LocalStorageKeys.SELECTED_PROJECT_INDEX, index);
 };
 
 export const mutations = {
@@ -32,28 +39,33 @@ export const mutations = {
         }
 
         state.selectedProjectId = selectedProjectId;
+        const selectedProjectIndex = findSelectedProjectIndex(
+            selectedProjectId,
+            state.projects
+        );
+        state.selectedProjectIndex = selectedProjectIndex;
     },
     addProject(state, project) {
         state.projects.push(project);
         state.selectedProjectId = project.id;
 
         saveProjectState(state.projects);
-        saveSelectedProjectId(project.id);
+        saveSelectedProject(project.id, state.projects.length - 1);
     },
 
     selectProject(state, projectId) {
         state.selectedProjectId = projectId;
+        state.selectedProjectIndex = findSelectedProjectIndex(
+            projectId,
+            state.projects
+        );
     },
 
     createService(state, service) {
-        console.log('Selected project id: ', state.selectedProjectId);
-        console.log('Projects: ', state.projects);
         const selectedProjectIndex = _.findIndex(
             state.projects,
             (project) => project.id === state.selectedProjectId
         );
-        console.log('Selected Project Index: ', selectedProjectIndex);
-        console.log('Project Selected: ', state.projects[selectedProjectIndex]);
         state.projects[selectedProjectIndex].services.push(service);
         saveProjectState(state.projects);
     },

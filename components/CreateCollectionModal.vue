@@ -50,8 +50,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, PropSync, Watch } from 'vue-property-decorator';
-import axios from '~/plugins/axios';
-
 // TODO: move to mixin
 export interface FormDefinition {
     valid: boolean;
@@ -110,7 +108,7 @@ export default class CreateCollectionModal extends Vue {
         this.isLoading = true;
 
         try {
-            const response = await axios.get('/uuid');
+            const response = await this.$axios.get('/uuid');
             const uuid = response.data.data;
             const service = {
                 id: uuid,
@@ -118,10 +116,12 @@ export default class CreateCollectionModal extends Vue {
                 description: this.form.fields.description,
                 type: 'collection',
                 metadata: {
-                    layers: {
-                        name: 'Background',
-                        elements: [],
-                    },
+                    layers: [
+                        {
+                            name: 'Background',
+                            elements: [],
+                        },
+                    ],
                 },
                 emailAddress: '',
                 collectionSize: 100,

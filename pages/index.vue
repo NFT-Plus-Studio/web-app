@@ -29,32 +29,31 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import axios from '~/plugins/axios';
+// import axios from '~/plugins/axios';
 import _ from 'underscore';
 
 @Component
 export default class DashboardPage extends Vue {
     async created() {
-        this.$store.commit('loadFromLocalStorage');
-
-        if (this.$store.state.projects.length === 0) {
-            try {
-                const response = await axios.get('/uuid');
-                const uuid = response.data.data;
-                // TODO: create a definition some where
-                const defaultProject = {
-                    id: uuid,
-                    name: 'Default',
-                    services: [],
-                    createdAt: Date.now(),
-                    updatedAt: Date.now(),
-                };
-                this.$store.commit('addProject', defaultProject);
-            } catch (err) {
-                // TODO: show toast message or something
-                console.log('Error creating default project', err);
-            }
-        }
+        // this.$store.commit('loadFromLocalStorage');
+        // if (this.$store.state.projects.length === 0) {
+        //     try {
+        //         const response = await axios.get('/uuid');
+        //         const uuid = response.data.data;
+        //         // TODO: create a definition some where
+        //         const defaultProject = {
+        //             id: uuid,
+        //             name: 'Default',
+        //             services: [],
+        //             createdAt: Date.now(),
+        //             updatedAt: Date.now(),
+        //         };
+        //         this.$store.commit('addProject', defaultProject);
+        //     } catch (err) {
+        //         // TODO: show toast message or something
+        //         console.log('Error creating default project', err);
+        //     }
+        // }
     }
 
     get services() {
@@ -66,6 +65,7 @@ export default class DashboardPage extends Vue {
         if (selectedProjectIndex === -1) {
             return [];
         }
+
         return this.$store.state.projects[selectedProjectIndex].services || [];
     }
 }

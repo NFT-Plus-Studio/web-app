@@ -70,7 +70,7 @@ export default class ProjectItem extends Vue {
 
     navigate() {
         this.$router.push({
-            path: `/${this.id}`,
+            path: `/${this.type}/${this.id}`,
         });
     }
 }

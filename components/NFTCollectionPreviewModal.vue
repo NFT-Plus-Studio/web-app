@@ -46,7 +46,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'underscore';
-import axios from '~/plugins/axios';
 
 @Component
 export default class NFTCollectionPreviewModal extends Vue {
@@ -98,7 +97,7 @@ export default class NFTCollectionPreviewModal extends Vue {
             }
 
             try {
-                const response = await axios({
+                const response = await this.$axios({
                     url: '/preview',
                     method: 'POST',
                     data: bodyFormData,

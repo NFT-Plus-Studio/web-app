@@ -6,7 +6,11 @@
                 <v-list class="layer-list" flat color="transparent">
                     <v-list-item-group @change="onLayerSelected">
                         <Container v-if="layers.length > 0" @drop="onDrop">
-                            <Draggable v-for="(layer, index) in layers" :key="index" class="layers-container">
+                            <Draggable
+                                v-for="(layer, index) in layers"
+                                :key="index"
+                                class="layers-container"
+                            >
                                 <v-list-item
                                     :class="{
                                         'pink-item-border': layer.selected,
@@ -21,12 +25,18 @@
                                         <v-col cols="2">
                                             <div class="layer-stats">
                                                 <!-- <span>50%</span> -->
-                                                <span>{{ layer.traits.length }}</span>
+                                                <span>{{
+                                                    layer.elements.length
+                                                }}</span>
                                             </div>
                                         </v-col>
                                     </v-row>
                                     <v-btn
-                                        class="layer-close-btn item-close-btn ma-2"
+                                        class="
+                                            layer-close-btn
+                                            item-close-btn
+                                            ma-2
+                                        "
                                         text
                                         x-small
                                         icon
@@ -86,7 +96,7 @@
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
                 <template v-if="selectedLayer">
                     <div
-                        v-for="(trait, index) in selectedLayer.traits"
+                        v-for="(trait, index) in selectedLayer.elements"
                         :key="index"
                         :class="{
                             'pink-item-border': trait.selected,
@@ -216,7 +226,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Container, Draggable } from "vue-smooth-dnd"
+import { Container, Draggable } from 'vue-smooth-dnd';
 import _ from 'underscore';
 
 // TODO: move to mixin
@@ -240,7 +250,7 @@ interface ElementProps {
 // TODO: move to mixin
 interface LayerProps {
     name: string;
-    traits: Array<ElementProps>;
+    elements: Array<ElementProps>;
     selected: boolean;
 }
 
@@ -256,7 +266,7 @@ const elementTemplate: ElementProps = {
 
 const layerTemplate: LayerProps = {
     name: '',
-    traits: [],
+    elements: [],
     selected: false,
 };
 
@@ -264,25 +274,91 @@ const layerTemplate: LayerProps = {
     layout: 'editor',
     components: {
         Container,
-        Draggable
-    }
+        Draggable,
+    },
+    asyncData({ params }) {
+        const collectionId = params.collectionId;
+        return { collectionId };
+    },
 })
 export default class NFTGeneratorEditor extends Vue {
     newLayerName: string = '';
     showGenerateCollectionModalFlag: boolean = false;
 
     layers: LayerProps[] = [];
+    collectionId!: string;
 
     // collection setting properties
     collectionSettings = {
         name: '',
         description: '',
+        emailAddress: '',
+        collectionSize: 100,
     };
 
-    asyncData({ params }: any) {
-        const slug = params.fileId;
+    async mounted() {
+        const service: any = _.find(
+            this.$store.state.projects[this.$store.state.selectedProjectIndex]
+                .services,
+            { id: this.collectionId }
+        );
 
-        return { slug };
+        this.collectionSettings.name = service.name;
+        this.collectionSettings.description = service.description;
+        this.collectionSettings.emailAddress = service.emailAddress;
+        try {
+            for (const [
+                layerIndex,
+                layer,
+            ] of service.metadata.layers.entries()) {
+                const newLayer: LayerProps = {
+                    name: layer.name,
+                    selected: layerIndex === 0,
+                    elements: [],
+                };
+
+                console.log('Layer: ', layer, layerIndex);
+
+                for (const [
+                    elementIndex,
+                    element,
+                ] of layer.elements.entries()) {
+                    const newElement: ElementProps = {
+                        name: element.name,
+                        rarity: String(element.rarity),
+                        fileInfo: element.fileInfo,
+                        selected: layerIndex === 0 && elementIndex === 0,
+                        file: this.dataURLtoFile(
+                            element.fileBase64,
+                            element.fileInfo.name
+                        ),
+                        base64Image: element.fileBase64,
+                        image: await this.getBase64AsImage(element.fileBase64),
+                    };
+
+                    newLayer.elements.push(newElement);
+                }
+
+                this.layers.push(newLayer);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // TODO: move to mixin
+    dataURLtoFile(dataUrl: any, fileName: any) {
+        const arr = dataUrl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new File([u8arr], fileName, { type: mime });
     }
 
     get selectedLayer(): any {
@@ -307,7 +383,6 @@ export default class NFTGeneratorEditor extends Vue {
 
         return result;
     }
-
 
     onDrop(dropResult: any) {
         this.layers = this.applyDrag(this.layers, dropResult);
@@ -360,16 +435,16 @@ export default class NFTGeneratorEditor extends Vue {
             // TODO: add toast error message here
             console.log('Error adding new trait: ', err);
         }
-        if (this.selectedLayer.traits.length === 0) {
+        if (this.selectedLayer.elements.length === 0) {
             newTrait.selected = true;
         }
-        this.selectedLayer.traits.push(newTrait);
-        this.selectTrait(this.selectedLayer.traits.length - 1);
+        this.selectedLayer.elements.push(newTrait);
+        this.selectTrait(this.selectedLayer.elements.length - 1);
     }
 
     deleteTrait(index: number) {
-        this.selectedLayer.traits.splice(index, 1);
-        this.selectTrait(this.selectedLayer.traits.length - 1);
+        this.selectedLayer.elements.splice(index, 1);
+        this.selectTrait(this.selectedLayer.elements.length - 1);
     }
 
     // TODO: move to mixin
@@ -421,27 +496,27 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     get selectedTrait() {
-        if (this.selectedLayer?.traits.length === 0) {
+        if (this.selectedLayer?.elements.length === 0) {
             return null;
         }
         const currentIndex = _.findIndex(
-            this.selectedLayer?.traits,
+            this.selectedLayer?.elements,
             (t: any) => t.selected
         );
-        return this.selectedLayer?.traits[this.indexFound(currentIndex) || 0];
+        return this.selectedLayer?.elements[this.indexFound(currentIndex) || 0];
     }
 
     selectTrait(newSelectedIndex: number) {
         const currentIndex = _.findIndex(
-            this.selectedLayer.traits,
+            this.selectedLayer.elements,
             (t: any) => t.selected
         );
 
-        if (this.selectedLayer.traits[newSelectedIndex]) {
-            this.selectedLayer.traits[
+        if (this.selectedLayer.elements[newSelectedIndex]) {
+            this.selectedLayer.elements[
                 this.indexFound(currentIndex) || 0
             ].selected = false;
-            this.selectedLayer.traits[newSelectedIndex].selected = true;
+            this.selectedLayer.elements[newSelectedIndex].selected = true;
         }
     }
 
