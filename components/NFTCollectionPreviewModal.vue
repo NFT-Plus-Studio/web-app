@@ -2,9 +2,7 @@
     <v-dialog v-model="showModal" width="568">
         <v-card light>
             <v-app-bar flat color="rgba(255, 255, 255, 0)">
-                <v-toolbar-title class="text-h6 pl-0">
-                    Preview
-                </v-toolbar-title>
+                <v-toolbar-name class="text-h6 pl-0"> Preview </v-toolbar-name>
 
                 <v-spacer></v-spacer>
 
@@ -137,9 +135,7 @@ export default class NFTCollectionPreviewModal extends Vue {
     } {
         const collectionConfig = {
             collectionSize: 4,
-            layersOrder: _.map(layers, (layer) =>
-                layer.title.replace('_', ' ')
-            ),
+            layersOrder: _.map(layers, (layer) => layer.name.replace('_', ' ')),
             shuffleLayerConfigurations: false,
             description: 'Preview',
             userEmailAddress: 'preview@sample.com',
@@ -150,7 +146,7 @@ export default class NFTCollectionPreviewModal extends Vue {
         for (const layer of layers) {
             for (const trait of layer.traits) {
                 const fileType = trait.fileInfo.type.split('/')[1];
-                const modifiedFileName = `${layer.title.replace('_', ' ')}_${
+                const modifiedFileName = `${layer.name.replace('_', ' ')}_${
                     trait.name
                 }#${trait.rarity}.${fileType}`;
                 const newFile = new File([trait.file], modifiedFileName);

@@ -46,7 +46,7 @@
                         outlined
                     ></v-text-field>
 
-                    <v-menu class="mb-5" offset-y light>
+                    <!-- <v-menu class="mb-5" offset-y light>
                         <template #activator="{ on, attrs }">
                             <v-btn
                                 block
@@ -86,7 +86,7 @@
                                 </v-list-item-group>
                             </v-list>
                         </v-card>
-                    </v-menu>
+                    </v-menu> -->
 
                     <div class="d-flex justify-center">
                         <v-btn
@@ -95,7 +95,7 @@
                             :disabled="!form.valid"
                             dark
                             class="py-5"
-                            >Pay &amp; Generate</v-btn
+                            >Confirm</v-btn
                         >
                     </div>
                 </v-form>
