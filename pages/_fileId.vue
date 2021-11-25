@@ -222,7 +222,7 @@ interface FileInfo {
 }
 
 // TODO: move to mixin
-interface TraitProps {
+interface ElementProps {
     name: string;
     rarity: string | number;
     file: File | null;
@@ -235,11 +235,11 @@ interface TraitProps {
 // TODO: move to mixin
 interface LayerProps {
     name: string;
-    traits: Array<TraitProps>;
+    traits: Array<ElementProps>;
     selected: boolean;
 }
 
-const traitTemplate: TraitProps = {
+const elementTemplate: ElementProps = {
     name: '',
     rarity: '100',
     file: null,
@@ -311,7 +311,9 @@ export default class NFTGeneratorEditor extends Vue {
             return;
         }
 
-        const newTrait: TraitProps = JSON.parse(JSON.stringify(traitTemplate));
+        const newTrait: ElementProps = JSON.parse(
+            JSON.stringify(elementTemplate)
+        );
         newTrait.name = file.name.split('.')[0];
         newTrait.file = file;
         newTrait.fileInfo = {

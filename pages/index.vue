@@ -62,10 +62,10 @@ export default class DashboardPage extends Vue {
             this.$store.state.projects,
             (project) => project.id === this.$store.state.selectedProjectId
         );
-        console.log(
-            'Services',
-            this.$store.state.projects[selectedProjectIndex].services
-        );
+
+        if (selectedProjectIndex === -1) {
+            return [];
+        }
         return this.$store.state.projects[selectedProjectIndex].services || [];
     }
 }
