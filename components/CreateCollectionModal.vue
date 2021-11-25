@@ -2,9 +2,9 @@
     <v-dialog v-model="syncedShowModal" width="568">
         <v-card light>
             <v-app-bar flat color="rgba(255, 255, 255, 0)">
-                <v-toolbar-title class="text-h6 pl-0">
+                <v-toolbar-name class="text-h6 pl-0">
                     Create Collection
-                </v-toolbar-title>
+                </v-toolbar-name>
 
                 <v-spacer></v-spacer>
 
@@ -19,9 +19,9 @@
                     @submit.prevent="onSubmit"
                 >
                     <v-text-field
-                        v-model="form.fields.title"
-                        label="Title"
-                        :rules="form.rules.title"
+                        v-model="form.fields.name"
+                        label="Name"
+                        :rules="form.rules.name"
                         outlined
                     ></v-text-field>
                     <v-textarea
@@ -36,6 +36,7 @@
                             type="submit"
                             :disabled="!form.valid"
                             dark
+                            :loading="isLoading"
                             class="py-5"
                             >Create</v-btn
                         >
@@ -49,6 +50,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, PropSync, Watch } from 'vue-property-decorator';
+import axios from '~/plugins/axios';
 
 // TODO: move to mixin
 export interface FormDefinition {
@@ -76,11 +78,11 @@ function minCharacterRule(
 
 interface Form extends FormDefinition {
     fields: {
-        title: string;
+        name: string;
         description: string;
     };
     rules: {
-        title: ((message?: string) => {})[];
+        name: ((message?: string) => {})[];
         description: ((message?: string) => {})[];
     };
 }
@@ -92,17 +94,51 @@ export default class CreateCollectionModal extends Vue {
     form: Form = {
         valid: false,
         fields: {
-            title: '',
+            name: '',
             description: '',
         },
         rules: {
-            title: [requiredRule(), minCharacterRule()],
+            name: [requiredRule(), minCharacterRule()],
             description: [requiredRule(), minCharacterRule()],
         },
     };
 
-    onSubmit() {
-        // TODO: implement this method
+    isLoading: boolean = false;
+
+    async onSubmit() {
+        // TODO: use proper definition
+        this.isLoading = true;
+
+        try {
+            const response = await axios.get('/uuid');
+            const uuid = response.data.data;
+            const service = {
+                id: uuid,
+                name: this.form.fields.name,
+                description: this.form.fields.description,
+                type: 'collection',
+                metadata: {
+                    layers: {
+                        name: 'Background',
+                        elements: [],
+                    },
+                },
+                emailAddress: '',
+                collectionSize: 100,
+                animatedPreviewBase64: null,
+                hasGenerated: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            };
+
+            this.$store.commit('createService', service);
+            this.isLoading = false;
+            this.syncedShowModal = false;
+        } catch (err) {
+            console.log('Error creating collection: ', err);
+            this.isLoading = false;
+        }
+
         console.log('Submits :) ');
     }
 
@@ -113,9 +149,10 @@ export default class CreateCollectionModal extends Vue {
         }
 
         // reset stuff here
-        this.form.fields.title = '';
+        this.form.fields.name = '';
         this.form.fields.description = '';
         this.form.valid = false;
+        this.isLoading = false;
     }
 }
 </script>

@@ -14,8 +14,8 @@
                         >
                             <v-row align-content="center">
                                 <v-col cols="10" class="pa-0">
-                                    <span class="layer-title">{{
-                                        layer.title
+                                    <span class="layer-name">{{
+                                        layer.name
                                     }}</span>
                                 </v-col>
                                 <v-col cols="2">
@@ -121,8 +121,8 @@
                         <div class="input-container">
                             <label>Name</label>
                             <v-text-field
-                                v-model="selectedLayer.title"
-                                value="selectedLayer.title"
+                                v-model="selectedLayer.name"
+                                value="selectedLayer.name"
                                 outlined
                                 hide-details
                                 dense
@@ -203,7 +203,7 @@
         <GenerateCollectionModal
             :show-modal.sync="showGenerateCollectionModalFlag"
             :layer-data.sync="layers"
-            :title.sync="collectionSettings.title"
+            :name.sync="collectionSettings.name"
             :description.sync="collectionSettings.description"
         />
     </v-row>
@@ -234,7 +234,7 @@ interface TraitProps {
 
 // TODO: move to mixin
 interface LayerProps {
-    title: string;
+    name: string;
     traits: Array<TraitProps>;
     selected: boolean;
 }
@@ -250,7 +250,7 @@ const traitTemplate: TraitProps = {
 };
 
 const layerTemplate: LayerProps = {
-    title: '',
+    name: '',
     traits: [],
     selected: false,
 };
@@ -262,22 +262,17 @@ export default class NFTGeneratorEditor extends Vue {
     newLayerName: string = '';
     showGenerateCollectionModalFlag: boolean = false;
 
-    layers: LayerProps[] = [
-        {
-            title: 'Background',
-            traits: [],
-            selected: true,
-        },
-    ];
+    layers: LayerProps[] = [];
 
     // collection setting properties
     collectionSettings = {
-        title: '',
+        name: '',
         description: '',
     };
 
     asyncData({ params }: any) {
         const slug = params.fileId;
+
         return { slug };
     }
 
@@ -297,7 +292,7 @@ export default class NFTGeneratorEditor extends Vue {
         }
 
         const newLayer: LayerProps = JSON.parse(JSON.stringify(layerTemplate));
-        newLayer.title = this.newLayerName.trim();
+        newLayer.name = this.newLayerName.trim();
         if (this.layers.length === 0) {
             newLayer.selected = true;
         }
@@ -524,7 +519,7 @@ export default class NFTGeneratorEditor extends Vue {
             align-items: center;
             width: 100%;
 
-            span.layer-title {
+            span.layer-name {
                 display: flex;
                 padding: 1em 0.8em;
                 white-space: nowrap;

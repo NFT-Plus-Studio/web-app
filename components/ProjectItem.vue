@@ -1,5 +1,5 @@
 <template>
-    <div class="project-item px-5 py-5">
+    <div class="project-item px-5 py-5" @click="navigate">
         <v-row align="center">
             <v-col cols="2"></v-col>
             <v-col cols="8">
@@ -29,25 +29,51 @@
         <v-row class="image-container mt-4">
             <div>
                 <img
+                    v-if="!previewImage"
                     class="type-icon mr-2"
                     width="38"
                     src="~/assets/images/icons/image-collection-icon.svg"
                 />
+                <v-img
+                    v-if="previewImage"
+                    class="type-icon mr-2"
+                    width="38"
+                    :src="previewImage"
+                />
             </div>
         </v-row>
         <p class="text-subtitle-1 text-center mt-7 font-weight-bold">
-            Tasty Bobas
+            {{ name }}
         </p>
     </div>
 </template>
 
-<script>
-export default {
-    data: () => ({
-        selectedItem: 0,
-        items: [{ title: 'Default' }],
-    }),
-};
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+
+@Component
+export default class ProjectItem extends Vue {
+    @Prop(String) id: string | undefined;
+    @Prop(String) name: string | undefined;
+    @Prop(String) previewImage: string | undefined;
+    @Prop(String) type: string | undefined;
+    @Prop(Boolean) hasGenerated: boolean | undefined;
+
+    get thumbnail() {
+        if (!this.previewImage) {
+            return require('../assets/images/icons/image-collection-icon.svg');
+        }
+
+        return this.previewImage;
+    }
+
+    navigate() {
+        this.$router.push({
+            path: `/${this.id}`,
+        });
+    }
+}
 </script>
 
 <style lang="scss">
@@ -57,6 +83,8 @@ export default {
     border: 2.23744px solid rgba(255, 255, 255, 0.33);
     box-sizing: border-box;
     border-radius: 6.71233px;
+    text-decoration: none;
+    color: white;
 
     .project-type {
         display: flex;
