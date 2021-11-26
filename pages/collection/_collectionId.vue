@@ -305,44 +305,34 @@ export default class NFTGeneratorEditor extends Vue {
 
         this.collectionSettings.name = service.name;
         this.collectionSettings.description = service.description;
+        this.collectionSettings.collectionSize = service.collectionSize;
         this.collectionSettings.emailAddress = service.emailAddress;
-        try {
-            for (const [
-                layerIndex,
-                layer,
-            ] of service.metadata.layers.entries()) {
-                const newLayer: LayerProps = {
-                    name: layer.name,
-                    selected: layerIndex === 0,
-                    elements: [],
+
+        for (const [layerIndex, layer] of service.metadata.layers.entries()) {
+            const newLayer: LayerProps = {
+                name: layer.name,
+                selected: layerIndex === 0,
+                elements: [],
+            };
+
+            for (const [elementIndex, element] of layer.elements.entries()) {
+                const newElement: ElementProps = {
+                    name: element.name,
+                    rarity: String(element.rarity),
+                    fileInfo: element.fileInfo,
+                    selected: layerIndex === 0 && elementIndex === 0,
+                    file: this.dataURLtoFile(
+                        element.fileBase64,
+                        element.fileInfo.name
+                    ),
+                    base64Image: element.fileBase64,
+                    image: await this.getBase64AsImage(element.fileBase64),
                 };
 
-                console.log('Layer: ', layer, layerIndex);
-
-                for (const [
-                    elementIndex,
-                    element,
-                ] of layer.elements.entries()) {
-                    const newElement: ElementProps = {
-                        name: element.name,
-                        rarity: String(element.rarity),
-                        fileInfo: element.fileInfo,
-                        selected: layerIndex === 0 && elementIndex === 0,
-                        file: this.dataURLtoFile(
-                            element.fileBase64,
-                            element.fileInfo.name
-                        ),
-                        base64Image: element.fileBase64,
-                        image: await this.getBase64AsImage(element.fileBase64),
-                    };
-
-                    newLayer.elements.push(newElement);
-                }
-
-                this.layers.push(newLayer);
+                newLayer.elements.push(newElement);
             }
-        } catch (err) {
-            console.error(err);
+
+            this.layers.push(newLayer);
         }
     }
 

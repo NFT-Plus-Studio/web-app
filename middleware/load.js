@@ -1,7 +1,7 @@
 import axios from '~/plugins/axios';
 
 export default function ({ store }) {
-    store.commit('loadFromLocalStorage');
+    store.commit('LOAD_FROM_LOCAL_STORAGE');
     if (store.state.projects.length === 0) {
         axios
             .get('/uuid')

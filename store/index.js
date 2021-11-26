@@ -10,7 +10,7 @@ const LocalStorageKeys = {
 export const state = () => ({
     projects: [],
     selectedProjectId: null,
-    selectProjectIndex: 0,
+    selectedProjectIndex: 0,
 });
 
 const saveProjectState = (projects) => {
@@ -27,7 +27,7 @@ const saveSelectedProject = (projectId, index) => {
 };
 
 export const mutations = {
-    loadFromLocalStorage(state) {
+    LOAD_FROM_LOCAL_STORAGE(state) {
         let localStorageData = localStorage.getItem(LocalStorageKeys.PROJECTS);
         const selectedProjectId = localStorage.getItem(
             LocalStorageKeys.SELECTED_PROJECT_ID
@@ -45,6 +45,7 @@ export const mutations = {
         );
         state.selectedProjectIndex = selectedProjectIndex;
     },
+
     addProject(state, project) {
         state.projects.push(project);
         state.selectedProjectId = project.id;
@@ -60,7 +61,6 @@ export const mutations = {
             state.projects
         );
     },
-
     createService(state, service) {
         const selectedProjectIndex = _.findIndex(
             state.projects,
@@ -70,3 +70,5 @@ export const mutations = {
         saveProjectState(state.projects);
     },
 };
+
+export const actions = {};
