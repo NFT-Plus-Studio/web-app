@@ -7,7 +7,7 @@
                     <v-col class="project-type" cols="12">
                         <div class="text-center px-6 py-2">
                             <img
-                                class="type-icon mr-2"
+                                class="mr-2"
                                 width="16"
                                 src="~/assets/images/icons/collection-icon.svg"
                             />
@@ -26,18 +26,26 @@
                 </div>
             </v-col>
         </v-row>
-        <v-row class="image-container mt-4">
+        <v-row
+            :style="
+                previewImage
+                    ? { background: 'transparent' }
+                    : { background: '#ff00a1' }
+            "
+            class="image-container mt-4"
+        >
             <div>
                 <img
                     v-if="!previewImage"
-                    class="type-icon mr-2"
+                    class="mr-2"
                     width="38"
                     src="~/assets/images/icons/image-collection-icon.svg"
                 />
-                <v-img
+                <img
                     v-if="previewImage"
-                    class="type-icon mr-2"
-                    width="38"
+                    contain
+                    class="preview-image"
+                    width="100%"
                     :src="previewImage"
                 />
             </div>
@@ -59,14 +67,6 @@ export default class ProjectItem extends Vue {
     @Prop(String) previewImage: string | undefined;
     @Prop(String) type: string | undefined;
     @Prop(Boolean) hasGenerated: boolean | undefined;
-
-    get thumbnail() {
-        if (!this.previewImage) {
-            return require('../assets/images/icons/image-collection-icon.svg');
-        }
-
-        return this.previewImage;
-    }
 
     navigate() {
         this.$router.push({
@@ -103,12 +103,16 @@ export default class ProjectItem extends Vue {
         justify-content: center;
 
         div {
-            background: #ff00a1;
             border-radius: 5.67901px;
             width: 115px;
-            height: 99.38px;
+            height: 100px;
             display: flex;
             justify-content: center;
+        }
+
+        .preview-image {
+            border-radius: 12px;
+            object-fit: contain;
         }
     }
 
