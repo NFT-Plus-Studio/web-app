@@ -435,6 +435,15 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.selected = true;
         }
         this.selectedLayer.elements.push(newTrait);
+        const currentLayerIndex = _.findIndex(
+            this.layers,
+            (t: any) => t.selected
+        );
+        this.$store.commit('ADD_ELEMENT', {
+            collectionId: this.collectionId,
+            layerIndex: currentLayerIndex,
+            element: newTrait,
+        });
         this.selectTrait(this.selectedLayer.elements.length - 1);
     }
 

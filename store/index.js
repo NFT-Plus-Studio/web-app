@@ -70,7 +70,7 @@ export const mutations = {
         saveProjectState(state.projects);
     },
 
-    ADD_LAYER(state, { collectionId, newLayer }) {
+    ADD_LAYER(state, { collectionId, layer }) {
         const serviceIndex = findServiceIndex(
             collectionId,
             state.projects[state.selectedProjectIndex].services
@@ -80,12 +80,43 @@ export const mutations = {
             return;
         }
 
-        const layer = JSON.parse(JSON.stringify(newLayer));
-        delete layer.selected;
+        const newLayer = JSON.parse(JSON.stringify(layer));
+        delete newLayer.selected;
         state.projects[state.selectedProjectIndex].services[
             serviceIndex
         ].metadata.layers.push(layer);
 
+        saveProjectState(state.projects);
+    },
+
+    ADD_ELEMENT(state, { collectionId, layerIndex, element }) {
+        const serviceIndex = findServiceIndex(
+            collectionId,
+            state.projects[state.selectedProjectIndex].services
+        );
+
+        if (serviceIndex === -1) {
+            return;
+        }
+
+        const newElement = JSON.parse(JSON.stringify(element));
+
+        // delete fields we don't need
+        delete element.selected;
+        delete element.image;
+        delete element.file;
+        delete element.selected;
+
+        newElement.fileBase64 = newElement.base64Image;
+
+        // delete base64Image field
+        delete newElement.base64Image;
+
+        state.projects[state.selectedProjectIndex].services[
+            serviceIndex
+        ].metadata.layers[layerIndex].elements.push(newElement);
+
+        // save the project state to local storage.
         saveProjectState(state.projects);
     },
 };
