@@ -41,7 +41,7 @@
                                         x-small
                                         icon
                                         color="red lighten-2"
-                                        @click="deleteLayer(index)"
+                                        @click="openDeleteModal(index)"
                                     >
                                         <v-icon x-small>mdi-close</v-icon>
                                     </v-btn>
@@ -220,6 +220,12 @@
             :name.sync="collectionSettings.name"
             :description.sync="collectionSettings.description"
         />
+        <DeleteLayerModal 
+            :show-modal="deleteLayerModalOpen" 
+            :layer-name="layerToDelete !== -1 ? layers[layerToDelete].name : ''" 
+            @delete-layer="deleteLayer" 
+            @delete-cancel="cancelDeletion"
+        />
     </v-row>
 </template>
 
@@ -288,6 +294,9 @@ export default class NFTGeneratorEditor extends Vue {
     layers: LayerProps[] = [];
     collectionId!: string;
 
+    deleteLayerModalOpen = false;
+    layerToDelete: number = -1;
+
     // collection setting properties
     collectionSettings = {
         name: '',
@@ -334,6 +343,16 @@ export default class NFTGeneratorEditor extends Vue {
 
             this.layers.push(newLayer);
         }
+    }
+
+    openDeleteModal(index: number) {
+        this.deleteLayerModalOpen = true
+        this.layerToDelete = index
+    }
+
+    cancelDeletion() {
+        this.deleteLayerModalOpen = false
+        this.layerToDelete = -1
     }
 
     // TODO: move to mixin
@@ -398,9 +417,11 @@ export default class NFTGeneratorEditor extends Vue {
         this.onLayerSelected(this.layers.length - 1);
     }
 
-    deleteLayer(index: number) {
-        this.layers.splice(index, 1);
+    deleteLayer() {
+        this.layers.splice(this.layerToDelete, 1);
         this.onLayerSelected(this.layers.length - 1);
+        this.deleteLayerModalOpen = false
+        this.layerToDelete = -1
     }
 
     async addNewTrait(file: File | null): Promise<void> {
