@@ -450,6 +450,15 @@ export default class NFTGeneratorEditor extends Vue {
     deleteTrait(index: number) {
         this.selectedLayer.elements.splice(index, 1);
         this.selectTrait(this.selectedLayer.elements.length - 1);
+        const currentLayerIndex = _.findIndex(
+            this.layers,
+            (t: any) => t.selected
+        );
+        this.$store.commit('DELETE_TRAIT', {
+            collectionId: this.collectionId,
+            layerIndex: currentLayerIndex,
+            elementIndex: index,
+        });
     }
 
     // TODO: move to mixin

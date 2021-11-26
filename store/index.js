@@ -119,6 +119,24 @@ export const mutations = {
         // save the project state to local storage.
         saveProjectState(state.projects);
     },
+
+    DELETE_TRAIT(state, { collectionId, layerIndex, elementIndex }) {
+        const serviceIndex = findServiceIndex(
+            collectionId,
+            state.projects[state.selectedProjectIndex].services
+        );
+
+        if (serviceIndex === -1) {
+            return;
+        }
+
+        state.projects[state.selectedProjectIndex].services[
+            serviceIndex
+        ].metadata.layers[layerIndex].elements.splice(elementIndex, 1);
+
+        // save the project state to local storage.
+        saveProjectState(state.projects);
+    },
 };
 
 export const actions = {};
