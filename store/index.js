@@ -21,6 +21,10 @@ const findSelectedProjectIndex = (id, projects) => {
     return _.findIndex(projects, (project) => project.id === id);
 };
 
+const findServiceIndex = (id, services) => {
+    return _.findIndex(services, (service) => service.id === id);
+};
+
 const saveSelectedProject = (projectId, index) => {
     localStorage.setItem(LocalStorageKeys.SELECTED_PROJECT_ID, projectId);
     localStorage.setItem(LocalStorageKeys.SELECTED_PROJECT_INDEX, index);
@@ -62,11 +66,26 @@ export const mutations = {
         );
     },
     createService(state, service) {
-        const selectedProjectIndex = _.findIndex(
-            state.projects,
-            (project) => project.id === state.selectedProjectId
+        state.projects[state.selectedProjectIndex].services.push(service);
+        saveProjectState(state.projects);
+    },
+
+    ADD_LAYER(state, { collectionId, newLayer }) {
+        const serviceIndex = findServiceIndex(
+            collectionId,
+            state.projects[state.selectedProjectIndex].services
         );
-        state.projects[selectedProjectIndex].services.push(service);
+
+        if (serviceIndex === -1) {
+            return;
+        }
+
+        const layer = JSON.parse(JSON.stringify(newLayer));
+        delete layer.selected;
+        state.projects[state.selectedProjectIndex].services[
+            serviceIndex
+        ].metadata.layers.push(layer);
+
         saveProjectState(state.projects);
     },
 };
