@@ -10,7 +10,7 @@
             <ItemSettingsSelector />
         </v-app-bar>
         <v-main>
-            <v-container fluid class="my-5 px-6">
+            <v-container fluid class="pt-11 pb-4 px-6 full-height-container">
                 <Nuxt />
             </v-container>
         </v-main>
@@ -47,5 +47,9 @@ export default {
 <style lang="scss">
 .v-sheet.v-app-bar.v-toolbar:not(.v-sheet--outlined) {
     box-shadow: 0px 5px 4px rgba(0, 0, 0, 0.1);
+}
+
+.full-height-container {
+    height: 100%;
 }
 </style>
