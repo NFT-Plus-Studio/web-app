@@ -79,7 +79,7 @@ export default class ProjectItem extends Vue {
 <style lang="scss">
 .project-item {
     width: 303.17px;
-    height: 245px;
+    height: 279px;
     border: 2.23744px solid rgba(255, 255, 255, 0.33);
     box-sizing: border-box;
     border-radius: 6.71233px;
@@ -104,14 +104,14 @@ export default class ProjectItem extends Vue {
 
         div {
             border-radius: 5.67901px;
-            width: 115px;
-            height: 100px;
+            width: 158px;
+            height: 137px;
             display: flex;
             justify-content: center;
         }
 
         .preview-image {
-            border-radius: 12px;
+            border-radius: 6px;
             object-fit: contain;
         }
     }
