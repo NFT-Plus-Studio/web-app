@@ -494,10 +494,10 @@ export default class NFTGeneratorEditor extends Vue {
         if (currentIndex > -1) {
             this.layers[this.indexFound(currentIndex) || 0].selected = false;
         }
-
         if (this.layers[i || 0]) {
             this.layers[i || 0].selected = true;
         }
+        this.selectTrait(0);
     }
 
     get selectedTrait() {
