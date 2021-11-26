@@ -207,7 +207,7 @@
                         </div>
                         <div class="file-info-container my-2">
                             <p>File Dimensions</p>
-                            <span>400x400</span>
+                            <span>{{selectedTrait.width}}x{{selectedTrait.height}}</span>
                         </div>
                     </div>
                 </div>
@@ -251,6 +251,8 @@ interface ElementProps {
     base64Image: string;
     image: HTMLImageElement;
     selected: boolean;
+    width: number;
+    height: number
 }
 
 // TODO: move to mixin
@@ -268,6 +270,8 @@ const elementTemplate: ElementProps = {
     selected: false,
     base64Image: '',
     image: new Image(),
+    width: 0,
+    height: 0
 };
 
 const layerTemplate: LayerProps = {
@@ -334,6 +338,8 @@ export default class NFTGeneratorEditor extends Vue {
                         element.fileBase64,
                         element.fileInfo.name
                     ),
+                    width: element.width,
+                    height: element.height,
                     base64Image: element.fileBase64,
                     image: await this.getBase64AsImage(element.fileBase64),
                 };
@@ -441,7 +447,10 @@ export default class NFTGeneratorEditor extends Vue {
         };
         try {
             newTrait.base64Image = await this.getBase64(file);
-            newTrait.image = await this.getBase64AsImage(newTrait.base64Image);
+            const image = await this.getBase64AsImage(newTrait.base64Image);
+            newTrait.image = image
+            newTrait.width = image.width
+            newTrait.height = image.height
         } catch (err) {
             // TODO: add toast error message here
             console.log('Error adding new trait: ', err);
@@ -486,6 +495,7 @@ export default class NFTGeneratorEditor extends Vue {
 
     onFilesSelected(fileList: FileList) {
         // don't add anything if no layer is selected
+        console.log(fileList)
         if (!this.selectedLayer) {
             return;
         }
