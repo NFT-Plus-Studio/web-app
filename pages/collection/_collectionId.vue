@@ -371,6 +371,12 @@ export default class NFTGeneratorEditor extends Vue {
             result.splice(addedIndex, 0, itemToAdd);
         }
 
+        this.$store.commit('REORDER_LAYER', {
+            collectionId: this.collectionId,
+            moveFromIndex: removedIndex,
+            moveToIndex: addedIndex,
+        });
+
         return result;
     }
 

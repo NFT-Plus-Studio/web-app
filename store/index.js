@@ -137,6 +137,28 @@ export const mutations = {
         // save the project state to local storage.
         saveProjectState(state.projects);
     },
+
+    REORDER_LAYER(state, { collectionId, moveFromIndex, moveToIndex }) {
+        const serviceIndex = findServiceIndex(
+            collectionId,
+            state.projects[state.selectedProjectIndex].services
+        );
+
+        if (serviceIndex === -1) {
+            return;
+        }
+
+        const itemToAdd = state.projects[state.selectedProjectIndex].services[
+            serviceIndex
+        ].metadata.layers.splice(moveFromIndex, 1)[0];
+
+        state.projects[state.selectedProjectIndex].services[
+            serviceIndex
+        ].metadata.layers.splice(moveToIndex, 0, itemToAdd);
+
+        // save the project state to local storage.
+        saveProjectState(state.projects);
+    },
 };
 
 export const actions = {};
