@@ -84,7 +84,7 @@ export const mutations = {
         delete newLayer.selected;
         state.projects[state.selectedProjectIndex].services[
             serviceIndex
-        ].metadata.layers.push(layer);
+        ].metadata.layers.push(newLayer);
 
         saveProjectState(state.projects);
     },
