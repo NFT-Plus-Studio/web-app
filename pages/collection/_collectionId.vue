@@ -581,7 +581,7 @@ export default class NFTGeneratorEditor extends Vue {
 <style lang="scss" scoped>
 .nft-generator-parent {
     width: 100%;
-    height: calc(100vh - 15vh);
+    height: 100%;
 
     $closeButtonPositionTop: -1.7em;
     $closeButtonPositionRight: -1.6em;
