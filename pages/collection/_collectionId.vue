@@ -103,7 +103,7 @@
                             'pink-item-border': element.selected,
                         }"
                         class="layer-thumbnail-container pa-2 mt-3 mx-2"
-                        @click="selectTrait(index)"
+                        @click.stop="selectTrait(index)"
                     >
                         <v-btn
                             v-if="element.selected"
@@ -390,7 +390,8 @@ export default class NFTGeneratorEditor extends Vue {
 
     get selectedLayer(): any {
         const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
-        return this.layers[this.indexFound(currentIndex) || 0];
+        // return this.layers[this.indexFound(currentIndex) || 0];
+        return this.layers[currentIndex];
     }
 
     applyDrag(arr: any, dragResult: any) {
@@ -562,23 +563,18 @@ export default class NFTGeneratorEditor extends Vue {
         }
         if (this.layers[i || 0]) {
             this.layers[i || 0].selected = true;
-
-            if (this.layers[i || 0].elements.length > 0) {
-                this.selectTrait(0);
-            }
         }
-        this.selectTrait(0);
     }
 
     get selectedTrait() {
-        if (this.selectedLayer?.elements.length === 0) {
+        if (!this.selectedLayer || this.selectedLayer.elements.length === 0) {
             return null;
         }
         const currentIndex = _.findIndex(
-            this.selectedLayer?.elements,
+            this.selectedLayer.elements,
             (t: any) => t.selected
         );
-        return this.selectedLayer?.elements[this.indexFound(currentIndex) || 0];
+        return this.selectedLayer.elements[this.indexFound(currentIndex) || 0];
     }
 
     selectTrait(newSelectedIndex: number) {
@@ -588,10 +584,21 @@ export default class NFTGeneratorEditor extends Vue {
         );
 
         if (this.selectedLayer.elements[newSelectedIndex]) {
+            console.log('We are in');
             this.selectedLayer.elements[
                 this.indexFound(currentIndex) || 0
             ].selected = false;
+
+            console.log(
+                'previous element is no false selected: ',
+                this.selectedLayer.elements[this.indexFound(currentIndex) || 0]
+            );
+
             this.selectedLayer.elements[newSelectedIndex].selected = true;
+            console.log(
+                'New element selected: ',
+                this.selectedLayer.elements[newSelectedIndex]
+            );
         }
     }
 
