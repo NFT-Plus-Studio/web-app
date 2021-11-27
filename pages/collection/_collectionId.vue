@@ -42,7 +42,7 @@
                                         x-small
                                         icon
                                         color="red lighten-2"
-                                        @click="deleteLayer(index)"
+                                        @click.stop="openDeleteModal(index)"
                                     >
                                         <v-icon x-small>mdi-close</v-icon>
                                     </v-btn>
@@ -97,16 +97,16 @@
                 <DropFilesZone class="mb-3" @files-selected="onFilesSelected" />
                 <template v-if="selectedLayer">
                     <div
-                        v-for="(trait, index) in selectedLayer.elements"
+                        v-for="(element, index) in selectedLayer.elements"
                         :key="index"
                         :class="{
-                            'pink-item-border': trait.selected,
+                            'pink-item-border': element.selected,
                         }"
                         class="layer-thumbnail-container pa-2 mt-3 mx-2"
                         @click="selectTrait(index)"
                     >
                         <v-btn
-                            v-if="trait.selected"
+                            v-if="element.selected"
                             class="close-btn item-close-btn ma-2"
                             text
                             x-small
@@ -121,9 +121,9 @@
                             width="76"
                             height="72"
                             contain
-                            :src="trait.base64Image"
+                            :src="element.base64Image"
                         ></v-img>
-                        <p>{{ trait.name }}</p>
+                        <p>{{ element.name }}</p>
                     </div>
                 </template>
             </div>
@@ -208,7 +208,11 @@
                         </div>
                         <div class="file-info-container my-2">
                             <p>File Dimensions</p>
-                            <span>400x400</span>
+                            <span
+                                >{{ selectedTrait.image.width }}x{{
+                                    selectedTrait.image.height
+                                }}</span
+                            >
                         </div>
                     </div>
                 </div>
@@ -220,6 +224,12 @@
             :layer-data.sync="layers"
             :name.sync="collectionSettings.name"
             :description.sync="collectionSettings.description"
+        />
+        <DeleteLayerModal
+            :show-modal.sync="deleteLayerModalOpen"
+            :layer-name.sync="layerNameToDelete"
+            @delete-layer="deleteLayer"
+            @delete-cancel="cancelDeletion"
         />
     </v-row>
 </template>
@@ -289,6 +299,9 @@ export default class NFTGeneratorEditor extends Vue {
     layers: LayerProps[] = [];
     collectionId!: string;
 
+    deleteLayerModalOpen = false;
+    layerToDeleteIndex: number = -1;
+
     // collection setting properties
     collectionSettings = {
         name: '',
@@ -335,6 +348,22 @@ export default class NFTGeneratorEditor extends Vue {
 
             this.layers.push(newLayer);
         }
+    }
+
+    openDeleteModal(index: number) {
+        this.deleteLayerModalOpen = true;
+        this.layerToDeleteIndex = index;
+    }
+
+    get layerNameToDelete() {
+        return this.layerToDeleteIndex !== -1
+            ? this.layers[this.layerToDeleteIndex].name
+            : '';
+    }
+
+    cancelDeletion() {
+        this.deleteLayerModalOpen = false;
+        this.layerToDeleteIndex = -1;
     }
 
     // TODO: move to mixin
@@ -415,9 +444,11 @@ export default class NFTGeneratorEditor extends Vue {
         this.onLayerSelected(this.layers.length - 1);
     }
 
-    deleteLayer(index: number) {
-        this.layers.splice(index, 1);
-        this.onLayerSelected(this.layers.length - 1);
+    deleteLayer() {
+        this.layers.splice(this.layerToDeleteIndex, 1);
+        this.onLayerSelected(this.layerToDeleteIndex);
+        this.deleteLayerModalOpen = false;
+        this.layerToDeleteIndex = -1;
     }
 
     async addNewTrait(file: File | null): Promise<void> {
@@ -437,7 +468,8 @@ export default class NFTGeneratorEditor extends Vue {
         };
         try {
             newTrait.base64Image = await this.getBase64(file);
-            newTrait.image = await this.getBase64AsImage(newTrait.base64Image);
+            const image = await this.getBase64AsImage(newTrait.base64Image);
+            newTrait.image = image;
         } catch (err) {
             // TODO: add toast error message here
             console.log('Error adding new trait: ', err);
@@ -500,6 +532,7 @@ export default class NFTGeneratorEditor extends Vue {
 
     onFilesSelected(fileList: FileList) {
         // don't add anything if no layer is selected
+        console.log(fileList);
         if (!this.selectedLayer) {
             return;
         }
@@ -516,6 +549,10 @@ export default class NFTGeneratorEditor extends Vue {
         }
         if (this.layers[i || 0]) {
             this.layers[i || 0].selected = true;
+
+            if (this.layers[i || 0].elements.length > 0) {
+                this.selectTrait(0);
+            }
         }
         this.selectTrait(0);
     }
@@ -570,7 +607,7 @@ export default class NFTGeneratorEditor extends Vue {
 <style lang="scss" scoped>
 .nft-generator-parent {
     width: 100%;
-    height: calc(100vh - 15vh);
+    height: 100%;
 
     $closeButtonPositionTop: -1.7em;
     $closeButtonPositionRight: -1.6em;
