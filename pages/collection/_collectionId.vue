@@ -42,7 +42,7 @@
                                         x-small
                                         icon
                                         color="red lighten-2"
-                                        @click="openDeleteModal(index)"
+                                        @click.stop="openDeleteModal(index)"
                                     >
                                         <v-icon x-small>mdi-close</v-icon>
                                     </v-btn>
