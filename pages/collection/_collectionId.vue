@@ -209,8 +209,8 @@
                         <div class="file-info-container my-2">
                             <p>File Dimensions</p>
                             <span
-                                >{{ selectedTrait.image.width }}x{{
-                                    selectedTrait.image.height
+                                >{{ selectedTrait.width }}x{{
+                                    selectedTrait.height
                                 }}</span
                             >
                         </div>
@@ -255,6 +255,8 @@ interface ElementProps {
     fileInfo: FileInfo | null;
     base64Image: string;
     image: HTMLImageElement;
+    width: string;
+    height: string;
     selected: boolean;
 }
 
@@ -273,6 +275,8 @@ const elementTemplate: ElementProps = {
     selected: false,
     base64Image: '',
     image: new Image(),
+    width: '',
+    height: '',
 };
 
 const layerTemplate: LayerProps = {
@@ -330,6 +334,7 @@ export default class NFTGeneratorEditor extends Vue {
             };
 
             for (const [elementIndex, element] of layer.elements.entries()) {
+                const image = await this.getBase64AsImage(element.fileBase64);
                 const newElement: ElementProps = {
                     name: element.name,
                     rarity: String(element.rarity),
@@ -340,7 +345,9 @@ export default class NFTGeneratorEditor extends Vue {
                         element.fileInfo.name
                     ),
                     base64Image: element.fileBase64,
-                    image: await this.getBase64AsImage(element.fileBase64),
+                    image,
+                    width: String(image.width),
+                    height: String(image.height),
                 };
 
                 newLayer.elements.push(newElement);
@@ -474,6 +481,8 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.base64Image = await this.getBase64(file);
             const image = await this.getBase64AsImage(newTrait.base64Image);
             newTrait.image = image;
+            newTrait.width = String(image.width);
+            newTrait.height = String(image.height);
         } catch (err) {
             // TODO: add toast error message here
             console.log('Error adding new trait: ', err);
