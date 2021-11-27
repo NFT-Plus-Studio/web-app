@@ -32,6 +32,7 @@
                                         </v-col>
                                     </v-row>
                                     <v-btn
+                                        v-if="layer.selected"
                                         class="
                                             layer-close-btn
                                             item-close-btn
