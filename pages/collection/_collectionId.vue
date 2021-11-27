@@ -226,8 +226,8 @@
             :description.sync="collectionSettings.description"
         />
         <DeleteLayerModal
-            :show-modal="deleteLayerModalOpen"
-            :layer-name="layerToDelete !== -1 ? layers[layerToDelete].name : ''"
+            :show-modal.sync="deleteLayerModalOpen"
+            :layer-name.sync="layerNameToDelete"
             @delete-layer="deleteLayer"
             @delete-cancel="cancelDeletion"
         />
@@ -304,7 +304,7 @@ export default class NFTGeneratorEditor extends Vue {
     collectionId!: string;
 
     deleteLayerModalOpen = false;
-    layerToDelete: number = -1;
+    layerToDeleteIndex: number = -1;
 
     // collection setting properties
     collectionSettings = {
@@ -358,12 +358,18 @@ export default class NFTGeneratorEditor extends Vue {
 
     openDeleteModal(index: number) {
         this.deleteLayerModalOpen = true;
-        this.layerToDelete = index;
+        this.layerToDeleteIndex = index;
+    }
+
+    get layerNameToDelete() {
+        return this.layerToDeleteIndex !== -1
+            ? this.layers[this.layerToDeleteIndex].name
+            : '';
     }
 
     cancelDeletion() {
         this.deleteLayerModalOpen = false;
-        this.layerToDelete = -1;
+        this.layerToDeleteIndex = -1;
     }
 
     // TODO: move to mixin
@@ -429,10 +435,10 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteLayer() {
-        this.layers.splice(this.layerToDelete, 1);
-        this.onLayerSelected(this.layerToDelete);
+        this.layers.splice(this.layerToDeleteIndex, 1);
+        this.onLayerSelected(this.layerToDeleteIndex);
         this.deleteLayerModalOpen = false;
-        this.layerToDelete = -1;
+        this.layerToDeleteIndex = -1;
     }
 
     async addNewTrait(file: File | null): Promise<void> {
