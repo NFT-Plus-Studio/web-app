@@ -120,6 +120,20 @@ export const mutations = {
         saveProjectState(state.projects);
     },
 
+    DELETE_LAYER(state, { collectionId, layerIndex }) {
+        const serviceIndex = findServiceIndex(
+            collectionId,
+            state.projects[state.selectedProjectIndex].services
+        );
+
+        state.projects[state.selectedProjectIndex].services[
+            serviceIndex
+        ].metadata.layers.splice(layerIndex, 1);
+
+        // save the project state to local storage.
+        saveProjectState(state.projects);
+    },
+
     DELETE_TRAIT(state, { collectionId, layerIndex, elementIndex }) {
         const serviceIndex = findServiceIndex(
             collectionId,
