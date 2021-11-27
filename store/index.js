@@ -4,7 +4,7 @@ const localStoragePrefix = process.env.NUXT_ENV_STORAGE_PREFIX;
 const LocalStorageKeys = {
     PROJECTS: `${localStoragePrefix}_projects`,
     SELECTED_PROJECT_ID: `${localStoragePrefix}_selected-project-id`,
-    SELECT_PROJECT_INDEX: `${localStoragePrefix}_selected-project-index`,
+    SELECTED_PROJECT_INDEX: `${localStoragePrefix}_selected-project-index`,
 };
 
 export const state = () => ({
@@ -66,6 +66,10 @@ export const mutations = {
         );
     },
     createService(state, service) {
+        console.log(
+            'Selected project: ',
+            state.projects[state.selectedProjectIndex]
+        );
         state.projects[state.selectedProjectIndex].services.push(service);
         saveProjectState(state.projects);
     },

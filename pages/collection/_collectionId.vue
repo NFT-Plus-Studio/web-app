@@ -389,9 +389,11 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     get selectedLayer(): any {
+        // const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
+        // // return this.layers[this.indexFound(currentIndex) || 0];
+        // return this.layers[currentIndex];
         const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
-        // return this.layers[this.indexFound(currentIndex) || 0];
-        return this.layers[currentIndex];
+        return this.layers[this.indexFound(currentIndex) || 0];
     }
 
     applyDrag(arr: any, dragResult: any) {
@@ -557,16 +559,27 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     onLayerSelected(i: number) {
+        // const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
+        // if (currentIndex > -1) {
+        //     this.layers[this.indexFound(currentIndex) || 0].selected = false;
+        // }
+        // if (this.layers[i || 0]) {
+        //     this.layers[i || 0].selected = true;
+        // }
         const currentIndex = _.findIndex(this.layers, (t: any) => t.selected);
-        if (currentIndex > -1) {
-            this.layers[this.indexFound(currentIndex) || 0].selected = false;
-        }
-        if (this.layers[i || 0]) {
-            this.layers[i || 0].selected = true;
-        }
+        this.layers[this.indexFound(currentIndex) || 0].selected = false;
+        this.layers[i || 0].selected = true;
     }
 
     get selectedTrait() {
+        // if (!this.selectedLayer || this.selectedLayer.elements.length === 0) {
+        //     return null;
+        // }
+        // const currentIndex = _.findIndex(
+        //     this.selectedLayer.elements,
+        //     (t: any) => t.selected
+        // );
+        // return this.selectedLayer.elements[this.indexFound(currentIndex) || 0];
         if (!this.selectedLayer || this.selectedLayer.elements.length === 0) {
             return null;
         }
@@ -578,28 +591,37 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     selectTrait(newSelectedIndex: number) {
+        // const currentIndex = _.findIndex(
+        //     this.selectedLayer.elements,
+        //     (t: any) => t.selected
+        // );
+
+        // if (this.selectedLayer.elements[newSelectedIndex]) {
+        //     console.log('We are in');
+        //     this.selectedLayer.elements[
+        //         this.indexFound(currentIndex) || 0
+        //     ].selected = false;
+
+        //     console.log(
+        //         'previous element is no false selected: ',
+        //         this.selectedLayer.elements[this.indexFound(currentIndex) || 0]
+        //     );
+
+        //     this.selectedLayer.elements[newSelectedIndex].selected = true;
+        //     console.log(
+        //         'New element selected: ',
+        //         this.selectedLayer.elements[newSelectedIndex]
+        //     );
+        // }
         const currentIndex = _.findIndex(
             this.selectedLayer.elements,
             (t: any) => t.selected
         );
 
-        if (this.selectedLayer.elements[newSelectedIndex]) {
-            console.log('We are in');
-            this.selectedLayer.elements[
-                this.indexFound(currentIndex) || 0
-            ].selected = false;
-
-            console.log(
-                'previous element is no false selected: ',
-                this.selectedLayer.elements[this.indexFound(currentIndex) || 0]
-            );
-
-            this.selectedLayer.elements[newSelectedIndex].selected = true;
-            console.log(
-                'New element selected: ',
-                this.selectedLayer.elements[newSelectedIndex]
-            );
-        }
+        this.selectedLayer.elements[
+            this.indexFound(currentIndex) || 0
+        ].selected = false;
+        this.selectedLayer.elements[newSelectedIndex].selected = true;
     }
 
     // TODO: move to mixin
