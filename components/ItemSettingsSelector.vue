@@ -49,7 +49,7 @@ export default {
     data: () => ({
         selectedItem: 0,
         items: [
-            { title: 'Collection Settings', icon: 'mdi-hammer-wrench' },
+            // { title: 'Collection Settings', icon: 'mdi-hammer-wrench' },
             { title: 'Delete Collection', icon: 'mdi-delete' },
         ],
     }),

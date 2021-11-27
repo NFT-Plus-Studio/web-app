@@ -401,6 +401,12 @@ export default class NFTGeneratorEditor extends Vue {
             result.splice(addedIndex, 0, itemToAdd);
         }
 
+        this.$store.commit('REORDER_LAYER', {
+            collectionId: this.collectionId,
+            moveFromIndex: removedIndex,
+            moveToIndex: addedIndex,
+        });
+
         return result;
     }
 
@@ -409,7 +415,11 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     openPreviewModal() {
-        this.$root.$emit('open-nft-collection-preview-modal', this.layers);
+        this.$root.$emit(
+            'open-nft-collection-preview-modal',
+            this.collectionId,
+            this.layers
+        );
     }
 
     addNewLayer() {
@@ -424,6 +434,12 @@ export default class NFTGeneratorEditor extends Vue {
             newLayer.selected = true;
         }
         this.layers.push(newLayer);
+
+        this.$store.commit('ADD_LAYER', {
+            collectionId: this.collectionId,
+            layer: newLayer,
+        });
+
         this.newLayerName = '';
         this.onLayerSelected(this.layers.length - 1);
     }
@@ -462,12 +478,30 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.selected = true;
         }
         this.selectedLayer.elements.push(newTrait);
+        const currentLayerIndex = _.findIndex(
+            this.layers,
+            (t: any) => t.selected
+        );
+        this.$store.commit('ADD_ELEMENT', {
+            collectionId: this.collectionId,
+            layerIndex: currentLayerIndex,
+            element: newTrait,
+        });
         this.selectTrait(this.selectedLayer.elements.length - 1);
     }
 
     deleteTrait(index: number) {
         this.selectedLayer.elements.splice(index, 1);
         this.selectTrait(this.selectedLayer.elements.length - 1);
+        const currentLayerIndex = _.findIndex(
+            this.layers,
+            (t: any) => t.selected
+        );
+        this.$store.commit('DELETE_TRAIT', {
+            collectionId: this.collectionId,
+            layerIndex: currentLayerIndex,
+            elementIndex: index,
+        });
     }
 
     // TODO: move to mixin
@@ -513,7 +547,6 @@ export default class NFTGeneratorEditor extends Vue {
         if (currentIndex > -1) {
             this.layers[this.indexFound(currentIndex) || 0].selected = false;
         }
-
         if (this.layers[i || 0]) {
             this.layers[i || 0].selected = true;
 
@@ -521,6 +554,7 @@ export default class NFTGeneratorEditor extends Vue {
                 this.selectTrait(0);
             }
         }
+        this.selectTrait(0);
     }
 
     get selectedTrait() {
