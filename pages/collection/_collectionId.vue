@@ -429,8 +429,8 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     deleteLayer() {
-        // this.layers.splice(this.layerToDelete, 1);
-        // this.onLayerSelected(this.layers.length - 1);
+        this.layers.splice(this.layerToDelete, 1);
+        this.onLayerSelected(this.layerToDelete);
         this.deleteLayerModalOpen = false;
         this.layerToDelete = -1;
     }
