@@ -34,39 +34,12 @@ import _ from 'underscore';
 
 @Component
 export default class DashboardPage extends Vue {
-    async created() {
-        // this.$store.commit('loadFromLocalStorage');
-        // if (this.$store.state.projects.length === 0) {
-        //     try {
-        //         const response = await axios.get('/uuid');
-        //         const uuid = response.data.data;
-        //         // TODO: create a definition some where
-        //         const defaultProject = {
-        //             id: uuid,
-        //             name: 'Default',
-        //             services: [],
-        //             createdAt: Date.now(),
-        //             updatedAt: Date.now(),
-        //         };
-        //         this.$store.commit('addProject', defaultProject);
-        //     } catch (err) {
-        //         // TODO: show toast message or something
-        //         console.log('Error creating default project', err);
-        //     }
-        // }
-    }
-
     get services() {
-        const selectedProjectIndex = _.findIndex(
-            this.$store.state.projects,
-            (project) => project.id === this.$store.state.selectedProjectId
-        );
-
-        if (selectedProjectIndex === -1) {
+        const selectedProject = this.$storage.project.selectedProject;
+        if (selectedProject.index === -1) {
             return [];
         }
-
-        return this.$store.state.projects[selectedProjectIndex].services || [];
+        return selectedProject.data.services || [];
     }
 }
 </script>

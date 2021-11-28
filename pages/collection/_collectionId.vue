@@ -315,18 +315,19 @@ export default class NFTGeneratorEditor extends Vue {
     };
 
     async mounted() {
-        const service: any = _.find(
-            this.$store.state.projects[this.$store.state.selectedProjectIndex]
-                .services,
-            { id: this.collectionId }
+        const service: any = this.$storage.collection.getCollection(
+            this.collectionId
         );
 
-        this.collectionSettings.name = service.name;
-        this.collectionSettings.description = service.description;
-        this.collectionSettings.collectionSize = service.collectionSize;
-        this.collectionSettings.emailAddress = service.emailAddress;
+        this.collectionSettings.name = service.data.name;
+        this.collectionSettings.description = service.data.description;
+        this.collectionSettings.collectionSize = service.data.collectionSize;
+        this.collectionSettings.emailAddress = service.data.emailAddress;
 
-        for (const [layerIndex, layer] of service.metadata.layers.entries()) {
+        for (const [
+            layerIndex,
+            layer,
+        ] of service.data.metadata.layers.entries()) {
             const newLayer: LayerProps = {
                 name: layer.name,
                 selected: layerIndex === 0,
@@ -408,6 +409,13 @@ export default class NFTGeneratorEditor extends Vue {
             result.splice(addedIndex, 0, itemToAdd);
         }
 
+        // auto-save re-order layer
+        this.$storage.collection.reorderElement({
+            collectionId: this.collectionId,
+            moveFromIndex: removedIndex,
+            moveToIndex: addedIndex,
+        });
+
         return result;
     }
 
@@ -431,12 +439,23 @@ export default class NFTGeneratorEditor extends Vue {
             newLayer.selected = true;
         }
         this.layers.push(newLayer);
+
+        // auto-save to local storage
+        this.$storage.collection.addLayer(this.collectionId, newLayer);
+
         this.newLayerName = '';
         this.onLayerSelected(this.layers.length - 1);
     }
 
     deleteLayer() {
         this.layers.splice(this.layerToDeleteIndex, 1);
+
+        // auto-save
+        this.$storage.collection.deleteLayer({
+            collectionId: this.collectionId,
+            layerIndex: this.layerToDeleteIndex,
+        });
+
         this.onLayerSelected(this.layerToDeleteIndex);
         this.deleteLayerModalOpen = false;
         this.layerToDeleteIndex = -1;
@@ -471,11 +490,36 @@ export default class NFTGeneratorEditor extends Vue {
             newTrait.selected = true;
         }
         this.selectedLayer.elements.push(newTrait);
+        const currentLayerIndex = _.findIndex(
+            this.layers,
+            (t: any) => t.selected
+        );
+
+        // auto save new element
+        this.$storage.collection.addElement({
+            collectionId: this.collectionId,
+            layerIndex: currentLayerIndex,
+            element: newTrait,
+        });
+
         this.selectTrait(this.selectedLayer.elements.length - 1);
     }
 
     deleteTrait(index: number) {
         this.selectedLayer.elements.splice(index, 1);
+
+        const currentLayerIndex = _.findIndex(
+            this.layers,
+            (t: any) => t.selected
+        );
+
+        // auto-save deleted trait state
+        this.$storage.collection.deleteElement({
+            collectionId: this.collectionId,
+            layerIndex: currentLayerIndex,
+            elementIndex: index,
+        });
+
         this.selectTrait(this.selectedLayer.elements.length - 1);
     }
 

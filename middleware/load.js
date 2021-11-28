@@ -1,8 +1,8 @@
 import axios from '~/plugins/axios';
 
-export default function ({ store }) {
-    store.commit('LOAD_FROM_LOCAL_STORAGE');
-    if (store.state.projects.length === 0) {
+export default function ({ $storage }) {
+    const projects = $storage.project.allProjects;
+    if (projects.length === 0) {
         axios
             .get('/uuid')
             .then((response) => {
@@ -15,7 +15,7 @@ export default function ({ store }) {
                     createdAt: Date.now(),
                     updatedAt: Date.now(),
                 };
-                store.commit('addProject', defaultProject);
+                $storage.project.add(defaultProject);
             })
             .catch((err) => {
                 console.log('Error getting uuid: ', err);
