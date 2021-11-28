@@ -1,7 +1,11 @@
 import _ from 'underscore';
 
 export const state = () => ({
-    projects: [],
+    project: {
+        id: null,
+        name: '',
+    },
+    objects: [],
 });
 
 export const mutations = {

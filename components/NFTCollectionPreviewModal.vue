@@ -78,15 +78,16 @@ export default class NFTCollectionPreviewModal extends Vue {
     async getPreview() {
         this.reset();
         try {
+            console.log('Raw layers', this.rawLayers);
             let selectedData: any = this.selectRandomDataForPreview();
+            console.log('Selcted Data: ', selectedData);
             selectedData = this.parseLayersToApiData(selectedData);
+
             if (selectedData.files.length < 4) {
                 throw new Error(
                     'You must have provide at least two (2) layers with at least two(2) traits each.'
                 );
             }
-
-            console.log('Selcted Data: ', selectedData);
 
             const bodyFormData = new FormData();
             bodyFormData.append(
@@ -130,9 +131,9 @@ export default class NFTCollectionPreviewModal extends Vue {
 
     selectRandomDataForPreview(): any[] {
         return this.rawLayers.map((layer: any) => {
-            const traitSample = _.sample(layer.traits, 2);
+            const traitSample = _.sample(layer.elements, 2);
             const newLayer = JSON.parse(JSON.stringify(layer));
-            newLayer.traits = traitSample;
+            newLayer.elements = traitSample;
             return newLayer;
         });
     }
@@ -153,7 +154,7 @@ export default class NFTCollectionPreviewModal extends Vue {
         const files: File[] = [];
         // rename the files
         for (const layer of layers) {
-            for (const trait of layer.traits) {
+            for (const trait of layer.elements) {
                 const fileType = trait.fileInfo.type.split('/')[1];
                 const modifiedFileName = `${layer.name.replace('_', ' ')}_${
                     trait.name

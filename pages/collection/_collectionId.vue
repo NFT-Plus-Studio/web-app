@@ -218,7 +218,7 @@
                 </div>
             </div>
         </v-col>
-        <NFTCollectionPreviewModal :collection-id="collectionId" />
+        <NFTCollectionPreviewModal />
         <GenerateCollectionModal
             :show-modal.sync="showGenerateCollectionModalFlag"
             :layer-data.sync="layers"
@@ -424,7 +424,11 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     openPreviewModal() {
-        this.$root.$emit('open-nft-collection-preview-modal', this.layers);
+        this.$root.$emit(
+            'open-nft-collection-preview-modal',
+            this.collectionId,
+            this.layers
+        );
     }
 
     addNewLayer() {
