@@ -218,7 +218,7 @@
                 </div>
             </div>
         </v-col>
-        <NFTCollectionPreviewModal />
+        <NFTCollectionPreviewModal :collection-id="collectionId" />
         <GenerateCollectionModal
             :show-modal.sync="showGenerateCollectionModalFlag"
             :layer-data.sync="layers"

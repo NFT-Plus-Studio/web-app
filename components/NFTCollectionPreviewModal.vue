@@ -55,14 +55,16 @@ export default class NFTCollectionPreviewModal extends Vue {
     errorFound: boolean = false;
     errorMessage: string = '';
     previewImage: string = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA';
+    collectionId!: string;
 
     created() {
         this.$root.$on('open-nft-collection-preview-modal', this.openModal);
     }
 
-    openModal(layers: any[]) {
+    openModal(collectionId: string, layers: any[]) {
         this.reset();
         this.rawLayers = layers;
+        this.collectionId = collectionId;
         this.getPreview();
         this.showModal = true;
     }
@@ -106,6 +108,14 @@ export default class NFTCollectionPreviewModal extends Vue {
 
                 this.isLoading = false;
                 this.previewImage = response.data.data;
+
+                // auto-save collection preview image
+                this.$storage.collection.update({
+                    collectionId: this.collectionId,
+                    dataToUpdate: {
+                        animatedPreviewBase64: this.previewImage,
+                    },
+                });
             } catch (err: any) {
                 console.log('Error from api: ', err);
                 throw new Error('Something went wrong.');

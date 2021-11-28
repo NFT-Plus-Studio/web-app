@@ -98,10 +98,10 @@ const collectionOperations = {
         const newElement = JSON.parse(JSON.stringify(element));
 
         // delete fields we don't need
-        delete element.selected;
-        delete element.image;
-        delete element.file;
-        delete element.selected;
+        delete newElement.selected;
+        delete newElement.image;
+        delete newElement.file;
+        delete newElement.selected;
 
         newElement.fileBase64 = newElement.base64Image;
 
@@ -165,6 +165,31 @@ const collectionOperations = {
             collection.index
         ].metadata.layers[layerIndex].elements.splice(elementIndex, 1);
 
+        projectOperations.saveEverything(allProjects);
+    },
+    update({ collectionId, dataToUpdate }: any) {
+        const collection = this.getCollection(collectionId);
+        if (collection.index === -1) {
+            return;
+        }
+
+        const allProjects = projectOperations.allProjects;
+        const selectedProject = projectOperations.selectedProject;
+
+        for (const key of Object.keys(dataToUpdate)) {
+            const hasKey = _.has(
+                allProjects[selectedProject.index].services[collection.index],
+                key
+            );
+
+            if (hasKey) {
+                allProjects[selectedProject.index].services[collection.index][
+                    key
+                ] = dataToUpdate[key];
+            }
+        }
+
+        // save to local storage
         projectOperations.saveEverything(allProjects);
     },
 };
