@@ -30,13 +30,14 @@
         </v-menu>
         <CreateCollectionModal
             :show-modal.sync="showCreateCollectionModalFlag"
+            @collection-created="onCollectionCreated"
         />
     </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Emit } from 'vue-property-decorator';
 
 @Component
 export default class ProjectCreateButton extends Vue {
@@ -54,6 +55,13 @@ export default class ProjectCreateButton extends Vue {
             action: this.showCreateCollectionModal,
         },
     ];
+
+    onCollectionCreated(collection: any) {
+        this.collectionCreated(collection);
+    }
+
+    @Emit()
+    collectionCreated(_collection: any) {}
 }
 </script>
 

@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Component, PropSync, Watch } from 'vue-property-decorator';
+import { Component, PropSync, Watch, Emit } from 'vue-property-decorator';
 // TODO: move to mixin
 export interface FormDefinition {
     valid: boolean;
@@ -131,15 +131,20 @@ export default class CreateCollectionModal extends Vue {
                 updatedAt: Date.now(),
             };
 
-            this.$store.commit('createService', service);
-            this.isLoading = false;
-            this.syncedShowModal = false;
+            this.$storage.project.addService(service);
+            this.collectionCreated(service);
         } catch (err) {
             console.log('Error creating collection: ', err);
             this.isLoading = false;
         }
 
         console.log('Submits :) ');
+    }
+
+    @Emit()
+    collectionCreated(_collection: any) {
+        this.isLoading = false;
+        this.syncedShowModal = false;
     }
 
     @Watch('showModal')

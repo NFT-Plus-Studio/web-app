@@ -2,11 +2,13 @@
     <div>
         <div id="dashboard-header-container" class="mb-5">
             <h1 class="text-h5">Dashboard</h1>
-            <ProjectCreateButton />
+            <ProjectCreateButton
+                @collection-created="handleCollectionCreated"
+            />
         </div>
-        <div v-if="services.length > 0" class="d-flex flex-wrap">
+        <div v-if="items.length > 0" class="d-flex flex-wrap">
             <ProjectItem
-                v-for="(service, index) in services"
+                v-for="(service, index) in items"
                 :id="service.id"
                 :key="index"
                 :name="service.name"
@@ -17,7 +19,7 @@
             />
         </div>
         <v-img
-            v-if="services.length == 0"
+            v-if="items.length == 0"
             id="empty-convo-placeholder"
             max-height="479"
             contain
@@ -34,12 +36,22 @@ import _ from 'underscore';
 
 @Component
 export default class DashboardPage extends Vue {
+    items: any[] = [];
+
+    mounted() {
+        this.items = this.services;
+    }
+
     get services() {
         const selectedProject = this.$storage.project.selectedProject;
         if (selectedProject.index === -1) {
             return [];
         }
         return selectedProject.data.services || [];
+    }
+
+    handleCollectionCreated(collection: any) {
+        this.items.push(collection);
     }
 }
 </script>

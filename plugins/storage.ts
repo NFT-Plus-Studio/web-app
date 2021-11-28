@@ -48,7 +48,7 @@ const projectOperations = {
     addService(service: any) {
         const allProjects = this.allProjects;
         const selectedProject = this.selectedProject;
-        allProjects[selectedProject.index].service.push(service);
+        allProjects[selectedProject.index].services.push(service);
         this.saveEverything(allProjects);
     },
     saveEverything(allProjects: any[]) {
