@@ -1,6 +1,47 @@
 <template>
-    <div class="project-item px-5 py-5" @click="navigate">
-        <v-row align="center">
+    <div
+        :style="
+            previewImage
+                ? {
+                      background:
+                          'url(' + previewImage + ') no-repeat center center',
+                      backgroundSize: 'cover',
+                  }
+                : {
+                      background: `url(${require('~/assets/images/icons/image-collection-icon.svg')}) no-repeat center center`,
+                  }
+        "
+        class="project-item px-5 py-5"
+        @click="navigate"
+    >
+        <!-- <v-row
+            :style="
+                previewImage
+                    ? { background: 'transparent' }
+                    : { background: '#ff00a1' }
+            "
+            class="image-container mt-4"
+        >
+            <div>
+                <img
+                    v-if="!previewImage"
+                    class="type-icon mr-2"
+                    width="38"
+                    src="~/assets/images/icons/image-collection-icon.svg"
+                />
+                <div v-if="previewImage">
+                    <v-img
+                        contain
+                        class="rounded"
+                        width="100%"
+                        :src="previewImage"
+                    />
+                </div>
+            </div>
+        </v-row> -->
+
+        <div id="overlay"></div>
+        <v-row align="center" id="header">
             <v-col cols="2"></v-col>
             <v-col cols="8">
                 <v-row justify="center" align="center">
@@ -26,23 +67,10 @@
                 </div>
             </v-col>
         </v-row>
-        <v-row class="image-container mt-4">
-            <div>
-                <img
-                    v-if="!previewImage"
-                    class="type-icon mr-2"
-                    width="38"
-                    src="~/assets/images/icons/image-collection-icon.svg"
-                />
-                <v-img
-                    v-if="previewImage"
-                    class="type-icon mr-2"
-                    width="38"
-                    :src="previewImage"
-                />
-            </div>
-        </v-row>
-        <p class="text-subtitle-1 text-center mt-7 font-weight-bold">
+        <p
+            id="title-text"
+            class="text-subtitle-1 text-center mt-7 font-weight-bold"
+        >
             {{ name }}
         </p>
     </div>
@@ -78,23 +106,51 @@ export default class ProjectItem extends Vue {
 
 <style lang="scss">
 .project-item {
+    position: relative;
     width: 303.17px;
-    height: 245px;
+    height: 279px;
     border: 2.23744px solid rgba(255, 255, 255, 0.33);
     box-sizing: border-box;
     border-radius: 6.71233px;
     text-decoration: none;
     color: white;
 
-    .project-type {
-        display: flex;
-        justify-content: center;
+    #title-text {
+        position: absolute;
+        bottom: 5%;
+        width: 100%;
+        left: 0;
+    }
 
-        div {
-            display: inline-flex;
-            background: rgba(239, 237, 248, 0.58);
-            border-radius: 1.53448px;
-            font-size: 11px;
+    #overlay {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    #header {
+        position: absolute;
+        z-index: 2;
+        width: 95%;
+        .project-type {
+            justify-content: center;
+            display: flex;
+
+            div {
+                display: inline-flex;
+                background: rgba(239, 237, 248, 0.58);
+                border-radius: 1.53448px;
+                font-size: 11px;
+            }
+        }
+
+        .project-status {
+            display: flex;
+            flex: 1;
         }
     }
 
@@ -103,18 +159,19 @@ export default class ProjectItem extends Vue {
         justify-content: center;
 
         div {
-            background: #ff00a1;
+            // background: #ff00a1;
             border-radius: 5.67901px;
-            width: 115px;
-            height: 99.38px;
+            width: 158px;
+            height: 137px;
+
             display: flex;
             justify-content: center;
         }
-    }
 
-    .project-status {
-        display: flex;
-        flex: 1;
+        .preview-image {
+            border-radius: 6px;
+            object-fit: contain;
+        }
     }
 }
 
