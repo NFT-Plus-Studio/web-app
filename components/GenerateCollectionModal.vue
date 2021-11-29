@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="syncedShowModal" width="568">
+    <v-dialog v-model="syncedShowModal" width="600">
         <v-card light>
             <v-app-bar flat color="rgba(255, 255, 255, 0)">
                 <v-toolbar-title class="text-h6 pl-0">
@@ -13,6 +13,15 @@
                 </v-btn>
             </v-app-bar>
             <div class="px-5 pb-4">
+                <v-alert
+                    v-if="isSuccess || isError"
+                    :type="isSuccess ? 'success' : 'error'"
+                    >{{
+                        isSuccess
+                            ? 'Awesome! You should receive an email shortly. 🥳'
+                            : 'Something went wrong 🤔. Try again later. '
+                    }}</v-alert
+                >
                 <v-form
                     ref="form"
                     v-model="form.valid"
@@ -94,6 +103,7 @@
                             type="submit"
                             :disabled="!form.valid"
                             dark
+                            :loading="isLoading"
                             class="py-5"
                             >Confirm</v-btn
                         >
@@ -172,19 +182,9 @@ export default class GenerateCollectionModal extends Vue {
     ];
 
     selectedTokenIndex = 0;
-
-    @Watch('collectionSettings', { immediate: true, deep: true })
-    onCollectionSettingsChanged(val: any) {
-        if (!val) {
-            return;
-        }
-
-        this.$nuxt.$emit('set-object-name', val?.name);
-        this.$storage.collection.update({
-            collectionId: val?.id,
-            dataToUpdate: val,
-        });
-    }
+    isLoading: boolean = false;
+    isError: boolean = false;
+    isSuccess: boolean = false;
 
     get selectedToken() {
         return this.supportedTokens[this.selectedTokenIndex];
@@ -207,7 +207,23 @@ export default class GenerateCollectionModal extends Vue {
 
     onSubmit() {
         // TODO: implement this method
-        console.log('Submits :) ');
+        this.isLoading = true;
+        this.isError = true;
+    }
+
+    @Watch('collectionSettings', { immediate: true, deep: true })
+    onCollectionSettingsChanged(val: any) {
+        if (!val) {
+            return;
+        }
+
+        if (val.name.length >= 5 && val.description.length >= 5) {
+            this.$nuxt.$emit('set-object-name', val?.name);
+            this.$storage.collection.update({
+                collectionId: val?.id,
+                dataToUpdate: val,
+            });
+        }
     }
 
     @Watch('showModal')
