@@ -55,8 +55,8 @@ export default {
         name: '',
     }),
     created() {
-        this.$nuxt.$on('object-set', (object) => {
-            this.name = object.name;
+        this.$nuxt.$on('set-object-name', (objectName) => {
+            this.name = objectName;
         });
     },
 };

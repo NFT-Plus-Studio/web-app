@@ -20,13 +20,13 @@
                 >
                     <p class="grey--text">Collection Settings</p>
                     <v-text-field
-                        v-model="form.fields.title"
+                        v-model="syncedCollectionSettings.name"
                         label="Title"
                         :rules="form.rules.title"
                         outlined
                     ></v-text-field>
                     <v-textarea
-                        v-model="form.fields.description"
+                        v-model="syncedCollectionSettings.description"
                         hide-details
                         outlined
                         rows="2"
@@ -34,13 +34,13 @@
                     ></v-textarea>
                     <p class="mt-3 grey--text">Generate Settings</p>
                     <v-text-field
-                        v-model="form.fields.email"
+                        v-model="syncedCollectionSettings.emailAddress"
                         label="Email"
                         :rules="form.rules.email"
                         outlined
                     ></v-text-field>
                     <v-text-field
-                        v-model="form.fields.collectionSize"
+                        v-model="syncedCollectionSettings.collectionSize"
                         label="# of images to generate"
                         :rules="form.rules.collectionSize"
                         outlined
@@ -159,8 +159,8 @@ interface Form extends FormDefinition {
 export default class GenerateCollectionModal extends Vue {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
     @PropSync('layerData', { type: Array }) syncedLayers!: any[];
-    @PropSync('title', { type: String }) syncedTitle!: any;
-    @PropSync('description', { type: String }) syncedDescription!: any;
+    @PropSync('collectionSettings', { type: Object })
+    syncedCollectionSettings!: any;
 
     supportedTokens = [
         {
@@ -172,6 +172,19 @@ export default class GenerateCollectionModal extends Vue {
     ];
 
     selectedTokenIndex = 0;
+
+    @Watch('collectionSettings', { immediate: true, deep: true })
+    onCollectionSettingsChanged(val: any) {
+        if (!val) {
+            return;
+        }
+
+        this.$nuxt.$emit('set-object-name', val?.name);
+        this.$storage.collection.update({
+            collectionId: val?.id,
+            dataToUpdate: val,
+        });
+    }
 
     get selectedToken() {
         return this.supportedTokens[this.selectedTokenIndex];
