@@ -319,6 +319,20 @@ export default class NFTGeneratorEditor extends Vue {
             this.collectionId
         );
 
+        const objectData = {
+            id: service.data.id,
+            name: service.data.name,
+            description: service.data.description,
+            type: service.data.type,
+            emailAddress: service.data.emailAddress,
+            collectionSize: Number(service.data.collectionSize),
+            hasGenerated: service.data.hasGenerated,
+        };
+
+        this.$store.commit('SET_OBJECT', objectData);
+
+        this.$nuxt.$emit('object-set', objectData);
+
         this.collectionSettings.name = service.data.name;
         this.collectionSettings.description = service.data.description;
         this.collectionSettings.collectionSize = service.data.collectionSize;
@@ -424,7 +438,11 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     openPreviewModal() {
-        this.$root.$emit('open-nft-collection-preview-modal', this.layers);
+        this.$root.$emit(
+            'open-nft-collection-preview-modal',
+            this.collectionId,
+            this.layers
+        );
     }
 
     addNewLayer() {

@@ -55,14 +55,16 @@ export default class NFTCollectionPreviewModal extends Vue {
     errorFound: boolean = false;
     errorMessage: string = '';
     previewImage: string = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA';
+    collectionId!: string;
 
     created() {
         this.$root.$on('open-nft-collection-preview-modal', this.openModal);
     }
 
-    openModal(layers: any[]) {
+    openModal(collectionId: string, layers: any[]) {
         this.reset();
         this.rawLayers = layers;
+        this.collectionId = collectionId;
         this.getPreview();
         this.showModal = true;
     }
@@ -78,13 +80,12 @@ export default class NFTCollectionPreviewModal extends Vue {
         try {
             let selectedData: any = this.selectRandomDataForPreview();
             selectedData = this.parseLayersToApiData(selectedData);
+
             if (selectedData.files.length < 4) {
                 throw new Error(
                     'You must have provide at least two (2) layers with at least two(2) traits each.'
                 );
             }
-
-            console.log('Selcted Data: ', selectedData);
 
             const bodyFormData = new FormData();
             bodyFormData.append(
@@ -106,6 +107,14 @@ export default class NFTCollectionPreviewModal extends Vue {
 
                 this.isLoading = false;
                 this.previewImage = response.data.data;
+
+                // auto-save collection preview image
+                this.$storage.collection.update({
+                    collectionId: this.collectionId,
+                    dataToUpdate: {
+                        animatedPreviewBase64: this.previewImage,
+                    },
+                });
             } catch (err: any) {
                 console.log('Error from api: ', err);
                 throw new Error('Something went wrong.');
@@ -120,9 +129,9 @@ export default class NFTCollectionPreviewModal extends Vue {
 
     selectRandomDataForPreview(): any[] {
         return this.rawLayers.map((layer: any) => {
-            const traitSample = _.sample(layer.traits, 2);
+            const traitSample = _.sample(layer.elements, 2);
             const newLayer = JSON.parse(JSON.stringify(layer));
-            newLayer.traits = traitSample;
+            newLayer.elements = traitSample;
             return newLayer;
         });
     }
@@ -143,7 +152,7 @@ export default class NFTCollectionPreviewModal extends Vue {
         const files: File[] = [];
         // rename the files
         for (const layer of layers) {
-            for (const trait of layer.traits) {
+            for (const trait of layer.elements) {
                 const fileType = trait.fileInfo.type.split('/')[1];
                 const modifiedFileName = `${layer.name.replace('_', ' ')}_${
                     trait.name
