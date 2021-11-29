@@ -15,7 +15,7 @@
                     depressed
                     v-on="on"
                 >
-                    <span>Tasty Bobabs</span>
+                    <span>{{ name }}</span>
                     <v-icon class="ml-1" small color="white">
                         mdi-menu-down
                     </v-icon>
@@ -49,10 +49,16 @@ export default {
     data: () => ({
         selectedItem: 0,
         items: [
-            { title: 'Collection Settings', icon: 'mdi-hammer-wrench' },
+            // { title: 'Collection Settings', icon: 'mdi-hammer-wrench' },
             { title: 'Delete Collection', icon: 'mdi-delete' },
         ],
+        name: '',
     }),
+    created() {
+        this.$nuxt.$on('object-set', (object) => {
+            this.name = object.name;
+        });
+    },
 };
 </script>
 

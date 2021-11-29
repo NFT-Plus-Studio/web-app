@@ -78,9 +78,7 @@ export default class NFTCollectionPreviewModal extends Vue {
     async getPreview() {
         this.reset();
         try {
-            console.log('Raw layers', this.rawLayers);
             let selectedData: any = this.selectRandomDataForPreview();
-            console.log('Selcted Data: ', selectedData);
             selectedData = this.parseLayersToApiData(selectedData);
 
             if (selectedData.files.length < 4) {
