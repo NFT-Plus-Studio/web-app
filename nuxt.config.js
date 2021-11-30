@@ -32,6 +32,50 @@ export default {
                 name: 'theme-color',
                 content: '#000000',
             },
+            {
+                property: 'og:type',
+                content: 'website',
+            },
+            {
+                property: 'og:url',
+                content: 'https://app.nftplus.studio',
+            },
+            {
+                property: 'og:title',
+                content: 'NFT+ Studio',
+            },
+            {
+                property: 'og:description',
+                content:
+                    'NFT+ Studio is a platform that allows anyone to generate, customize and deploy NFT collections and smart contracts without coding knowledge.',
+            },
+            {
+                property: 'og:image',
+                content:
+                    'https://uploads-ssl.webflow.com/616d17f88acab6507439a0d2/617588e9453b275a53c60020_nft-plus-logo.png',
+            },
+            {
+                property: 'twitter:card',
+                content: 'summary_large_image',
+            },
+            {
+                property: 'twitter:url',
+                content: 'https://app.nftplus.studio',
+            },
+            {
+                property: 'twitter:title',
+                content: 'NFT+ Studio',
+            },
+            {
+                property: 'twitter:description',
+                content:
+                    'NFT+ Studio is a platform that allows anyone to generate, customize and deploy NFT collections and smart contracts without coding knowledge.',
+            },
+            {
+                property: 'twitter:image',
+                content:
+                    'https://uploads-ssl.webflow.com/616d17f88acab6507439a0d2/617588e9453b275a53c60020_nft-plus-logo.png',
+            },
         ],
         link: [
             { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
