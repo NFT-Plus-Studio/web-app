@@ -19,7 +19,7 @@
                     >{{
                         isSuccess
                             ? 'Awesome! You should receive an email shortly. 🥳'
-                            : 'Something went wrong 🤔. Try again later. '
+                            : errorMessage
                     }}</v-alert
                 >
                 <v-form
@@ -116,8 +116,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Component, PropSync, Watch } from 'vue-property-decorator';
+import { Component, PropSync, Watch, Mixins } from 'vue-property-decorator';
 import _ from 'underscore';
+import { Collection } from '@/mixins/collection';
 
 // TODO: move to mixin
 export interface FormDefinition {
@@ -166,7 +167,7 @@ interface Form extends FormDefinition {
 }
 
 @Component
-export default class GenerateCollectionModal extends Vue {
+export default class GenerateCollectionModal extends Mixins(Collection) {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
     @PropSync('layerData', { type: Array }) syncedLayers!: any[];
     @PropSync('collectionSettings', { type: Object })
@@ -184,6 +185,7 @@ export default class GenerateCollectionModal extends Vue {
     selectedTokenIndex = 0;
     isLoading: boolean = false;
     isError: boolean = false;
+    errorMessage: string = '';
     isSuccess: boolean = false;
 
     get selectedToken() {
@@ -205,10 +207,50 @@ export default class GenerateCollectionModal extends Vue {
         },
     };
 
-    onSubmit() {
-        // TODO: implement this method
+    async onSubmit() {
+        // reset
         this.isLoading = true;
-        this.isError = true;
+        this.isError = false;
+        this.isSuccess = false;
+
+        const parsedData = this.parseToApiData(
+            this.syncedCollectionSettings,
+            this.syncedLayers
+        );
+
+        // basic error handling
+        if (parsedData.files.length < 4) {
+            this.errorMessage = 'You must provide at least 4 files';
+            this.isError = true;
+            return;
+        }
+
+        const bodyFormData = new FormData();
+        bodyFormData.append(
+            'collectionConfig',
+            JSON.stringify(parsedData.collectionConfig)
+        );
+
+        for (const file of parsedData.files) {
+            bodyFormData.append('images', file);
+        }
+
+        try {
+            await this.$axios({
+                url: '/upload',
+                method: 'POST',
+                data: bodyFormData,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            this.isLoading = false;
+            this.isSuccess = true;
+        } catch (err) {
+            console.log('Error requesting to generate collection: ', err);
+            this.errorMessage = 'Something went wrong 🤔. Try again later.';
+            this.isError = true;
+            this.isLoading = false;
+        }
     }
 
     @Watch('collectionSettings', { immediate: true, deep: true })
@@ -233,6 +275,8 @@ export default class GenerateCollectionModal extends Vue {
         }
 
         // reset stuff here
+        this.isError = false;
+        this.isSuccess = false;
         this.form.valid = false;
     }
 }
