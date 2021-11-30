@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="syncedShowModal" width="568">
+    <v-dialog v-model="syncedShowModal" width="600">
         <v-card light>
             <v-app-bar flat color="rgba(255, 255, 255, 0)">
                 <v-toolbar-title class="text-h6 pl-0">
@@ -13,6 +13,15 @@
                 </v-btn>
             </v-app-bar>
             <div class="px-5 pb-4">
+                <v-alert
+                    v-if="isSuccess || isError"
+                    :type="isSuccess ? 'success' : 'error'"
+                    >{{
+                        isSuccess
+                            ? 'Awesome! You should receive an email shortly. 🥳'
+                            : errorMessage
+                    }}</v-alert
+                >
                 <v-form
                     ref="form"
                     v-model="form.valid"
@@ -20,13 +29,13 @@
                 >
                     <p class="grey--text">Collection Settings</p>
                     <v-text-field
-                        v-model="form.fields.title"
+                        v-model="syncedCollectionSettings.name"
                         label="Title"
                         :rules="form.rules.title"
                         outlined
                     ></v-text-field>
                     <v-textarea
-                        v-model="form.fields.description"
+                        v-model="syncedCollectionSettings.description"
                         hide-details
                         outlined
                         rows="2"
@@ -34,13 +43,13 @@
                     ></v-textarea>
                     <p class="mt-3 grey--text">Generate Settings</p>
                     <v-text-field
-                        v-model="form.fields.email"
+                        v-model="syncedCollectionSettings.emailAddress"
                         label="Email"
                         :rules="form.rules.email"
                         outlined
                     ></v-text-field>
                     <v-text-field
-                        v-model="form.fields.collectionSize"
+                        v-model="syncedCollectionSettings.collectionSize"
                         label="# of images to generate"
                         :rules="form.rules.collectionSize"
                         outlined
@@ -94,6 +103,7 @@
                             type="submit"
                             :disabled="!form.valid"
                             dark
+                            :loading="isLoading"
                             class="py-5"
                             >Confirm</v-btn
                         >
@@ -106,8 +116,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Component, PropSync, Watch } from 'vue-property-decorator';
+import { Component, PropSync, Watch, Mixins } from 'vue-property-decorator';
 import _ from 'underscore';
+import { Collection } from '@/mixins/collection';
 
 // TODO: move to mixin
 export interface FormDefinition {
@@ -156,11 +167,11 @@ interface Form extends FormDefinition {
 }
 
 @Component
-export default class GenerateCollectionModal extends Vue {
+export default class GenerateCollectionModal extends Mixins(Collection) {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
     @PropSync('layerData', { type: Array }) syncedLayers!: any[];
-    @PropSync('title', { type: String }) syncedTitle!: any;
-    @PropSync('description', { type: String }) syncedDescription!: any;
+    @PropSync('collectionSettings', { type: Object })
+    syncedCollectionSettings!: any;
 
     supportedTokens = [
         {
@@ -172,6 +183,10 @@ export default class GenerateCollectionModal extends Vue {
     ];
 
     selectedTokenIndex = 0;
+    isLoading: boolean = false;
+    isError: boolean = false;
+    errorMessage: string = '';
+    isSuccess: boolean = false;
 
     get selectedToken() {
         return this.supportedTokens[this.selectedTokenIndex];
@@ -192,9 +207,65 @@ export default class GenerateCollectionModal extends Vue {
         },
     };
 
-    onSubmit() {
-        // TODO: implement this method
-        console.log('Submits :) ');
+    async onSubmit() {
+        // reset
+        this.isLoading = true;
+        this.isError = false;
+        this.isSuccess = false;
+
+        const parsedData = this.parseToApiData(
+            this.syncedCollectionSettings,
+            this.syncedLayers
+        );
+
+        // basic error handling
+        if (parsedData.files.length < 4) {
+            this.errorMessage = 'You must provide at least 4 files';
+            this.isError = true;
+            return;
+        }
+
+        const bodyFormData = new FormData();
+        bodyFormData.append(
+            'collectionConfig',
+            JSON.stringify(parsedData.collectionConfig)
+        );
+
+        for (const file of parsedData.files) {
+            bodyFormData.append('images', file);
+        }
+
+        try {
+            await this.$axios({
+                url: '/upload',
+                method: 'POST',
+                data: bodyFormData,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            this.isLoading = false;
+            this.isSuccess = true;
+        } catch (err) {
+            console.log('Error requesting to generate collection: ', err);
+            this.errorMessage = 'Something went wrong 🤔. Try again later.';
+            this.isError = true;
+            this.isLoading = false;
+        }
+    }
+
+    @Watch('collectionSettings', { immediate: true, deep: true })
+    onCollectionSettingsChanged(val: any) {
+        if (!val) {
+            return;
+        }
+
+        if (val.name.length >= 5 && val.description.length >= 5) {
+            this.$nuxt.$emit('set-object-name', val?.name);
+            this.$storage.collection.update({
+                collectionId: val?.id,
+                dataToUpdate: val,
+            });
+        }
     }
 
     @Watch('showModal')
@@ -204,6 +275,8 @@ export default class GenerateCollectionModal extends Vue {
         }
 
         // reset stuff here
+        this.isError = false;
+        this.isSuccess = false;
         this.form.valid = false;
     }
 }

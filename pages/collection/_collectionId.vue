@@ -222,8 +222,7 @@
         <GenerateCollectionModal
             :show-modal.sync="showGenerateCollectionModalFlag"
             :layer-data.sync="layers"
-            :name.sync="collectionSettings.name"
-            :description.sync="collectionSettings.description"
+            :collection-settings.sync="collectionSettings"
         />
         <DeleteLayerModal
             :show-modal.sync="deleteLayerModalOpen"
@@ -308,6 +307,7 @@ export default class NFTGeneratorEditor extends Vue {
 
     // collection setting properties
     collectionSettings = {
+        id: '',
         name: '',
         description: '',
         emailAddress: '',
@@ -319,20 +319,9 @@ export default class NFTGeneratorEditor extends Vue {
             this.collectionId
         );
 
-        const objectData = {
-            id: service.data.id,
-            name: service.data.name,
-            description: service.data.description,
-            type: service.data.type,
-            emailAddress: service.data.emailAddress,
-            collectionSize: Number(service.data.collectionSize),
-            hasGenerated: service.data.hasGenerated,
-        };
+        this.$nuxt.$emit('set-object-name', service.data.name);
 
-        this.$store.commit('SET_OBJECT', objectData);
-
-        this.$nuxt.$emit('object-set', objectData);
-
+        this.collectionSettings.id = service.data.id;
         this.collectionSettings.name = service.data.name;
         this.collectionSettings.description = service.data.description;
         this.collectionSettings.collectionSize = service.data.collectionSize;
