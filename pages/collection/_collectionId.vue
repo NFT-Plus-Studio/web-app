@@ -433,7 +433,7 @@ export default class NFTGeneratorEditor extends Vue {
 
     openPreviewModal() {
         this.$gtag.event('collection_preview_button', {
-            collectionId: this.collectionId,
+            id: this.collectionId,
             num_layers: this.layers.length,
             num_traits: _.pluck(this.layers, 'elements').length,
         });
