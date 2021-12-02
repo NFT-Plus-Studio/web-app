@@ -289,7 +289,6 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         // reset stuff here
         this.isError = false;
         this.isSuccess = false;
-        this.form.valid = false;
     }
 }
 </script>
