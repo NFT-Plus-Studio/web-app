@@ -137,8 +137,6 @@ export default class CreateCollectionModal extends Vue {
             console.log('Error creating collection: ', err);
             this.isLoading = false;
         }
-
-        console.log('Submits :) ');
     }
 
     @Emit()

@@ -169,7 +169,6 @@ const collectionOperations = {
     },
     update({ collectionId, dataToUpdate }: any) {
         const collection = this.getCollection(collectionId);
-        console.log('Upadte Collection: ', collection);
         if (collection.index === -1) {
             return;
         }

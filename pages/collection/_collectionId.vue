@@ -568,7 +568,6 @@ export default class NFTGeneratorEditor extends Vue {
 
     onFilesSelected(fileList: FileList) {
         // don't add anything if no layer is selected
-        console.log(fileList);
         if (!this.selectedLayer) {
             return;
         }
