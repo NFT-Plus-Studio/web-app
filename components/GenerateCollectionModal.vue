@@ -245,11 +245,23 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
 
             this.isLoading = false;
             this.isSuccess = true;
-        } catch (err) {
+
+            this.$gtag.event('collection_generate_confirm_success', {
+                ...this.syncedCollectionSettings,
+                num_layers: parsedData.collectionConfig.layersOrder.length,
+                num_traits: parsedData.files.length,
+            });
+        } catch (err: any) {
             console.log('Error requesting to generate collection: ', err);
             this.errorMessage = 'Something went wrong 🤔. Try again later.';
             this.isError = true;
             this.isLoading = false;
+            this.$gtag.event('collection_generate_confirm_success', {
+                ...this.syncedCollectionSettings,
+                num_layers: parsedData.collectionConfig.layersOrder.length,
+                num_traits: parsedData.files.length,
+                error: err.message || err,
+            });
         }
     }
 

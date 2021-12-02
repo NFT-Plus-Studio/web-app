@@ -1,6 +1,6 @@
 import axios from '~/plugins/axios';
 
-export default function ({ $storage }) {
+export default function ({ $storage, $gtag }) {
     const projects = $storage.project.allProjects;
     if (projects.length === 0) {
         axios
@@ -16,8 +16,12 @@ export default function ({ $storage }) {
                     updatedAt: Date.now(),
                 };
                 $storage.project.add(defaultProject);
+                $gtag.event('new_user');
             })
             .catch((err) => {
+                $gtag.event('creating_default_project_error', {
+                    error: err.message || err,
+                });
                 console.log('Error getting uuid: ', err);
             });
     }

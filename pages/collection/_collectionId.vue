@@ -86,7 +86,7 @@
                     >
                     <v-btn
                         id="generate-btn"
-                        @click.stop="showGenerateCollectionModalFlag = true"
+                        @click.stop="showGenerateCollectionModal"
                         >Generate</v-btn
                     >
                 </div>
@@ -361,6 +361,11 @@ export default class NFTGeneratorEditor extends Vue {
         }
     }
 
+    showGenerateCollectionModal() {
+        this.$gtag.event('collection_generate_button');
+        this.showGenerateCollectionModalFlag = true;
+    }
+
     openDeleteModal(index: number) {
         this.deleteLayerModalOpen = true;
         this.layerToDeleteIndex = index;
@@ -414,7 +419,7 @@ export default class NFTGeneratorEditor extends Vue {
 
         // auto-save re-order layer
         this.$storage.collection.reorderElement({
-            collectionId: this.collectionId,
+            id: this.collectionId,
             moveFromIndex: removedIndex,
             moveToIndex: addedIndex,
         });
@@ -427,6 +432,11 @@ export default class NFTGeneratorEditor extends Vue {
     }
 
     openPreviewModal() {
+        this.$gtag.event('collection_preview_button', {
+            collectionId: this.collectionId,
+            num_layers: this.layers.length,
+            num_traits: _.pluck(this.layers, 'elements').length,
+        });
         this.$root.$emit(
             'open-nft-collection-preview-modal',
             this.collectionId,

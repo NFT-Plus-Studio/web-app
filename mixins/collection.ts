@@ -17,7 +17,7 @@ export class Collection extends Vue {
         collectionSettings: CollectionSettings,
         layers: any[]
     ): {
-        collectionConfig: {};
+        collectionConfig: any;
         files: File[];
     } {
         const collectionConfig = {

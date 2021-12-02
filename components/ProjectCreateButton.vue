@@ -45,6 +45,7 @@ export default class ProjectCreateButton extends Vue {
     showCreateCollectionModalFlag: boolean = false;
 
     showCreateCollectionModal() {
+        this.$gtag.event('dashboard_collection_button');
         this.showCreateCollectionModalFlag = true;
     }
 
@@ -57,6 +58,11 @@ export default class ProjectCreateButton extends Vue {
     ];
 
     onCollectionCreated(collection: any) {
+        this.$gtag.event('collection_created', {
+            id: collection.id,
+            name: collection.name,
+            description: collection.description,
+        });
         this.collectionCreated(collection);
     }
 
