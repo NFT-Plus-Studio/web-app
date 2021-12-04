@@ -142,6 +142,7 @@ export default class NFTCollectionPreviewModal extends Vue {
         files: File[];
     } {
         const collectionConfig = {
+            id: this.collectionId,
             collectionSize: 4,
             layersOrder: _.map(layers, (layer) => layer.name.replace('_', ' ')),
             shuffleLayerConfigurations: false,

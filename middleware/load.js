@@ -4,7 +4,7 @@ export default function ({ $storage, $gtag }) {
     const projects = $storage.project.allProjects;
     if (projects.length === 0) {
         axios
-            .get('/uuid')
+            .get('/uuid?type=new-user')
             .then((response) => {
                 const uuid = response.data.data;
                 // TODO: create a definition some where

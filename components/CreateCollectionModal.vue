@@ -108,7 +108,7 @@ export default class CreateCollectionModal extends Vue {
         this.isLoading = true;
 
         try {
-            const response = await this.$axios.get('/uuid');
+            const response = await this.$axios.get('/uuid?type=new-collection');
             const uuid = response.data.data;
             const service = {
                 id: uuid,

@@ -21,6 +21,7 @@ export class Collection extends Vue {
         files: File[];
     } {
         const collectionConfig = {
+            id: collectionSettings.id,
             title: collectionSettings.name,
             collectionSize: collectionSettings.collectionSize,
             layersOrder: _.map(layers, (layer) => layer.name.replace('_', ' ')),

@@ -15,7 +15,7 @@
                 :preview-image="service.animatedPreviewBase64"
                 :type="service.type"
                 :has-generated="service.hasGenerated"
-                class="mr-3"
+                class="mb-3 mr-3"
             />
         </div>
         <v-img
