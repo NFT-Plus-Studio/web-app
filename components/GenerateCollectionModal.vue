@@ -253,7 +253,13 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
             });
         } catch (err: any) {
             console.log('Error requesting to generate collection: ', err);
-            this.errorMessage = 'Something went wrong 🤔. Try again later.';
+
+            if (err.response) {
+                this.errorMessage = err.response.data.response.errors.message;
+            } else {
+                this.errorMessage = 'Something went wrong 🤔. Try again later.';
+            }
+
             this.isError = true;
             this.isLoading = false;
             this.$gtag.event('collection_generate_confirm_success', {
