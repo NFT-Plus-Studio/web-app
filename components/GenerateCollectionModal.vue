@@ -221,6 +221,7 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         // basic error handling
         if (parsedData.files.length < 4) {
             this.errorMessage = 'You must provide at least 4 files';
+            this.isLoading = false;
             this.isError = true;
             return;
         }
