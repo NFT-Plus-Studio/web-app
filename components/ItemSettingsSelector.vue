@@ -27,6 +27,7 @@
                         <v-list-item
                             v-for="(item, index) in items"
                             :key="index"
+                            @click.stop="item.action"
                         >
                             <v-list-item-icon>
                                 <v-icon v-text="item.icon" small></v-icon>
@@ -44,22 +45,35 @@
     </div>
 </template>
 
-<script>
-export default {
-    data: () => ({
-        selectedItem: 0,
-        items: [
-            // { title: 'Collection Settings', icon: 'mdi-hammer-wrench' },
-            { title: 'Delete Collection', icon: 'mdi-delete' },
-        ],
-        name: '',
-    }),
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+
+@Component
+export default class ItemSettingsSelector extends Vue {
+    selectedItem: number = 0;
+
+    deleteCollection() {
+        this.$nuxt.$emit('delete-collection');
+    }
+
+    items: any = [
+        // { title: 'Collection Settings', icon: 'mdi-hammer-wrench' },
+        {
+            title: 'Delete Collection',
+            icon: 'mdi-delete',
+            action: this.deleteCollection,
+        },
+    ];
+
+    name: string = '';
+
     created() {
-        this.$nuxt.$on('set-object-name', (objectName) => {
+        this.$nuxt.$on('set-object-name', (objectName: string) => {
             this.name = objectName;
         });
-    },
-};
+    }
+}
 </script>
 
 <style lang="scss" scoped>

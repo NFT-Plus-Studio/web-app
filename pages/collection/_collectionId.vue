@@ -42,7 +42,9 @@
                                         x-small
                                         icon
                                         color="red lighten-2"
-                                        @click.stop="openDeleteModal(index)"
+                                        @click.stop="
+                                            openDeleteLayerModal(index)
+                                        "
                                     >
                                         <v-icon x-small>mdi-close</v-icon>
                                     </v-btn>
@@ -224,12 +226,7 @@
             :layer-data.sync="layers"
             :collection-settings.sync="collectionSettings"
         />
-        <DeleteLayerModal
-            :show-modal.sync="deleteLayerModalOpen"
-            :layer-name.sync="layerNameToDelete"
-            @delete-layer="deleteLayer"
-            @delete-cancel="cancelDeletion"
-        />
+        <ConfirmationModal />
     </v-row>
 </template>
 
@@ -314,6 +311,12 @@ export default class NFTGeneratorEditor extends Vue {
         collectionSize: 100,
     };
 
+    created() {
+        this.$nuxt.$on('delete-collection', () => {
+            this.openDeleteCollectionModal();
+        });
+    }
+
     async mounted() {
         const service: any = this.$storage.collection.getCollection(
             this.collectionId
@@ -366,9 +369,48 @@ export default class NFTGeneratorEditor extends Vue {
         this.showGenerateCollectionModalFlag = true;
     }
 
-    openDeleteModal(index: number) {
+    deleteLayer() {
+        this.layers.splice(this.layerToDeleteIndex, 1);
+
+        // auto-save
+        this.$storage.collection.deleteLayer({
+            collectionId: this.collectionId,
+            layerIndex: this.layerToDeleteIndex,
+        });
+
+        this.onLayerSelected(this.layerToDeleteIndex);
+        this.deleteLayerModalOpen = false;
+        this.layerToDeleteIndex = -1;
+    }
+
+    deleteCollection() {
+        this.$storage.collection.delete(this.collectionId);
+        this.$router.push({
+            path: '/',
+        });
+    }
+
+    openDeleteCollectionModal() {
+        this.deleteLayerModalOpen = true;
+
+        this.$root.$emit('open-confirmation-modal', {
+            title: 'Delete Collection',
+            message: 'Are you sure you want to delete this collection?',
+            confirmationButtonTitle: 'Delete',
+            callback: this.deleteCollection,
+        });
+    }
+
+    openDeleteLayerModal(index: number) {
         this.deleteLayerModalOpen = true;
         this.layerToDeleteIndex = index;
+
+        this.$root.$emit('open-confirmation-modal', {
+            title: 'Delete Layer',
+            message: `Are you sure you want to delete the ${this.layers[index].name} layer?`,
+            confirmationButtonTitle: 'Delete',
+            callback: this.deleteLayer,
+        });
     }
 
     get layerNameToDelete() {
@@ -435,6 +477,7 @@ export default class NFTGeneratorEditor extends Vue {
         this.$gtag.event('collection_preview_button', {
             id: this.collectionId,
             num_layers: this.layers.length,
+            // TODO: fix this as it's not sending the correct values
             num_traits: _.pluck(this.layers, 'elements').length,
         });
         this.$root.$emit(
@@ -462,20 +505,6 @@ export default class NFTGeneratorEditor extends Vue {
 
         this.newLayerName = '';
         this.onLayerSelected(this.layers.length - 1);
-    }
-
-    deleteLayer() {
-        this.layers.splice(this.layerToDeleteIndex, 1);
-
-        // auto-save
-        this.$storage.collection.deleteLayer({
-            collectionId: this.collectionId,
-            layerIndex: this.layerToDeleteIndex,
-        });
-
-        this.onLayerSelected(this.layerToDeleteIndex);
-        this.deleteLayerModalOpen = false;
-        this.layerToDeleteIndex = -1;
     }
 
     async addNewTrait(file: File | null): Promise<void> {

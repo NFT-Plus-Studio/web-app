@@ -134,6 +134,21 @@ const collectionOperations = {
 
         projectOperations.saveEverything(allProjects);
     },
+    delete(collectionId: string) {
+        const collection = this.getCollection(collectionId);
+        if (collection.index === -1) {
+            return;
+        }
+
+        const allProjects = projectOperations.allProjects;
+        const selectedProject = projectOperations.selectedProject;
+
+        // removes service
+        allProjects[selectedProject.index].services.splice(collection.index, 1);
+
+        // save everything
+        projectOperations.saveEverything(allProjects);
+    },
     deleteLayer({ collectionId, layerIndex }: any) {
         const collection = this.getCollection(collectionId);
         if (collection.index === -1) {
