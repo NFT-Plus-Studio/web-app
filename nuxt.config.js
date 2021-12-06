@@ -138,6 +138,7 @@ export default {
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
     axios: {
         baseURL: process.env.NUXT_ENV_API_URL,
+        credentials: false,
     },
 
     // PWA module configuration: https://go.nuxtjs.dev/pwa

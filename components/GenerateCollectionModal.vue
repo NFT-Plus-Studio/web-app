@@ -98,10 +98,17 @@
                     </v-menu> -->
 
                     <div class="d-flex justify-center">
+                        <vue-hcaptcha
+                            sitekey="3355137f-7fb8-493b-8db5-46bcb103da35"
+                            @verify="onHcaptchaVerify"
+                            @reset="onHcaptchaReset"
+                        ></vue-hcaptcha>
+                    </div>
+                    <div class="d-flex justify-center">
                         <v-btn
                             id="create-button"
                             type="submit"
-                            :disabled="!form.valid"
+                            :disabled="!form.valid || !isHcaptchaVerified"
                             dark
                             :loading="isLoading"
                             class="py-5"
@@ -118,6 +125,7 @@
 import Vue from 'vue';
 import { Component, PropSync, Watch, Mixins } from 'vue-property-decorator';
 import _ from 'underscore';
+import VueHcaptcha from '@hcaptcha/vue-hcaptcha';
 import { Collection } from '@/mixins/collection';
 
 // TODO: move to mixin
@@ -166,7 +174,11 @@ interface Form extends FormDefinition {
     };
 }
 
-@Component
+@Component({
+    components: {
+        VueHcaptcha,
+    },
+})
 export default class GenerateCollectionModal extends Mixins(Collection) {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
     @PropSync('layerData', { type: Array }) syncedLayers!: any[];
@@ -187,6 +199,24 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
     isError: boolean = false;
     errorMessage: string = '';
     isSuccess: boolean = false;
+    hcaptchaToken: string = '';
+    isHcaptchaVerified: boolean = false;
+
+    get hCaptchaSiteKey(): string {
+        return process.env.NUXT_HCAPTCHA_SITE_KEY || '';
+    }
+
+    onHcaptchaVerify(token: string) {
+        this.isHcaptchaVerified = true;
+        this.hcaptchaToken = token;
+        console.log(this.hcaptchaToken);
+    }
+
+    onHcaptchaReset() {
+        console.log('onHcaptchaReset');
+        this.isHcaptchaVerified = false;
+        this.hcaptchaToken = '';
+    }
 
     get selectedToken() {
         return this.supportedTokens[this.selectedTokenIndex];
@@ -230,6 +260,11 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         bodyFormData.append(
             'collectionConfig',
             JSON.stringify(parsedData.collectionConfig)
+        );
+
+        bodyFormData.append(
+            'hcaptchaToken',
+            this.hcaptchaToken
         );
 
         for (const file of parsedData.files) {
