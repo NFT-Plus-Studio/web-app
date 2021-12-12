@@ -26,7 +26,8 @@
         "vue-gtag": "^1.16.1",
         "vue-property-decorator": "^9.1.2",
         "vue-smooth-dnd": "^0.8.1",
-        "vuetify": "^2.5.5"
+        "vuetify": "^2.5.5",
+        "web3": "^1.6.1"
     },
     "devDependencies": {
         "@babel/eslint-parser": "^7.14.7",

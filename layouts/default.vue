@@ -8,6 +8,8 @@
                 ></v-img>
             </template>
             <ProjectSelector />
+            <v-spacer></v-spacer>
+            <WalletConnectionButton />
         </v-app-bar>
         <v-main>
             <v-container fluid class="my-5 px-6">

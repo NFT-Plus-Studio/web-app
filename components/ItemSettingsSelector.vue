@@ -78,7 +78,7 @@ export default class ItemSettingsSelector extends Vue {
 
 <style lang="scss" scoped>
 .item-setting-selector {
-    width: 100%;
+    // width: 100%;
     display: inline;
     .breadcumb-container {
         display: inline;
