@@ -1,10 +1,15 @@
-# nft-plus-studio
+# NFT+ Studio Web App
+
+This project was built using NuxtJs. 
 
 ## Build Setup
 
 ```bash
 # install dependencies
 $ npm install
+
+# copy the env file example and fill in the values
+$ cp .env.example .env
 
 # serve with hot reload at localhost:3000
 $ npm run dev

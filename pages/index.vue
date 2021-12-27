@@ -32,7 +32,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 // import axios from '~/plugins/axios';
-import _ from 'underscore';
 
 @Component
 export default class DashboardPage extends Vue {
