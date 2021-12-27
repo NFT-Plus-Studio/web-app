@@ -33,12 +33,37 @@ class NFTStudioWeb3 implements NFTStudioWeb3Props {
         this._store = store;
     }
 
+    subscribeListeners() {
+        const handleChainChanged = (chainId: string) => {
+            this._store.commit('wallet/setProviderChainId', Number(chainId));
+        };
+
+        const handleAccountsChanged = (accounts: Array<string>) => {
+            if (accounts.length > 0) {
+                this._store.commit('wallet/setAddress', accounts[0]);
+            }
+        };
+        (<any>window).ethereum.on('chainChanged', handleChainChanged);
+
+        (<any>window).ethereum.on('accountsChanged', handleAccountsChanged);
+
+        (<any>window).addEventListener('unload', () => {
+            (<any>window).ethereum.removeListener(
+                'accountsChanged',
+                handleAccountsChanged
+            );
+            (<any>window).ethereum.removeListener(
+                'chainChanged',
+                handleChainChanged
+            );
+        });
+    }
+
     async connect(): Promise<boolean> {
         const ethereum = (<any>window).ethereum;
         if (ethereum) {
-            console.log('Is connected: ', ethereum.isConnected());
             const connectedProvider = new Web3(ethereum);
-
+            this.subscribeListeners();
             try {
                 const accounts = await ethereum.request({
                     method: 'eth_requestAccounts',
@@ -116,6 +141,7 @@ class NFTStudioWeb3 implements NFTStudioWeb3Props {
 const web3Plugin: Plugin = (_context, inject) => {
     const web3 = new NFTStudioWeb3(_context.store);
     web3.connect();
+
     inject('web3', web3);
 };
 
