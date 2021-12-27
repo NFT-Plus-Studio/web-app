@@ -13,15 +13,6 @@
                 </v-btn>
             </v-app-bar>
             <div class="px-5 pb-4">
-                <v-alert
-                    v-if="isSuccess || isError"
-                    :type="isSuccess ? 'success' : 'error'"
-                    >{{
-                        isSuccess
-                            ? 'Awesome! You should receive an email shortly. 🥳'
-                            : errorMessage
-                    }}</v-alert
-                >
                 <v-form
                     ref="form"
                     v-model="form.valid"
@@ -88,6 +79,15 @@
                             {{ price }} BNB
                         </p>
                     </div>
+                    <v-alert
+                        v-if="isSuccess || isError"
+                        :type="isSuccess ? 'success' : 'error'"
+                        >{{
+                            isSuccess
+                                ? 'Awesome! You should receive an email shortly. 🥳'
+                                : errorMessage
+                        }}</v-alert
+                    >
                     <div v-if="price == 0" class="d-flex justify-center">
                         <vue-hcaptcha
                             ref="myHcaptcha"
@@ -96,6 +96,7 @@
                             @reset="onHcaptchaReset"
                         ></vue-hcaptcha>
                     </div>
+
                     <div class="d-flex flex-column justify-center mt-3">
                         <v-btn
                             id="create-button"
@@ -194,6 +195,8 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
     isSuccess: boolean = false;
     hcaptchaToken: string = '';
     isHcaptchaVerified: boolean = false;
+    txHash = '';
+    shouldRetry: boolean = false;
 
     get hCaptchaSiteKey(): string {
         return process.env.NUXT_ENV_HCAPTCHA_SITE_KEY || '';
@@ -264,12 +267,13 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
             return;
         }
 
-        let txHash = null;
-        if (this.price > 0) {
+        if (this.price > 0 && this.txHash == '' && !this.shouldRetry) {
             try {
                 this.isWaitingForPayment = true;
-                txHash = await this.$web3.createDefaultChainPayment(this.price);
-                console.log('Transaction Hash: ', txHash);
+                this.txHash = await this.$web3.createDefaultChainPayment(
+                    this.price
+                );
+                console.log('Transaction Hash: ', this.txHash);
             } catch (error: any) {
                 this.isWaitingForPayment = false;
                 this.errorMessage = error.message;
@@ -286,6 +290,7 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         );
 
         bodyFormData.append('hcaptchaToken', this.hcaptchaToken);
+        bodyFormData.append('txHash', this.txHash);
 
         for (const file of parsedData.files) {
             bodyFormData.append('images', file);
@@ -299,9 +304,22 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
+            // reset
             this.isLoading = false;
             this.isSuccess = true;
+            this.txHash = '';
+            this.shouldRetry = false;
+            this.isWaitingForPayment = false;
 
+            // save flag collection has been generated
+            this.$storage.collection.update({
+                collectionId: this.syncedCollectionSettings.id,
+                dataToUpdate: {
+                    hasGenerated: true,
+                },
+            });
+
+            // record successful collections
             this.$gtag.event('collection_generate_confirm_success', {
                 ...this.syncedCollectionSettings,
                 num_layers: parsedData.collectionConfig.layersOrder.length,
@@ -314,8 +332,13 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
                 this.errorMessage = 'Something went wrong 🤔. Try again later.';
             }
 
+            // reset
             this.isError = true;
             this.isLoading = false;
+            this.shouldRetry = true;
+            this.isWaitingForPayment = false;
+
+            // track failures
             this.$gtag.event('collection_generate_confirm_success', {
                 ...this.syncedCollectionSettings,
                 num_layers: parsedData.collectionConfig.layersOrder.length,
@@ -349,10 +372,13 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         // reset stuff here
         this.isError = false;
         this.isSuccess = false;
+        this.shouldRetry = false;
+        this.txHash = '';
 
         if (this.$refs.myHcaptcha) {
             (<any>this.$refs.myHcaptcha).reset();
         }
+
         this.fetchPrice();
     }
 }
