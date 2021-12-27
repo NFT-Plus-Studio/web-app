@@ -88,7 +88,7 @@
                             {{ price }} BNB
                         </p>
                     </div>
-                    <div class="d-flex justify-center">
+                    <div v-if="price == 0" class="d-flex justify-center">
                         <vue-hcaptcha
                             ref="myHcaptcha"
                             sitekey="3355137f-7fb8-493b-8db5-46bcb103da35"
@@ -103,7 +103,7 @@
                             :disabled="
                                 !form.valid ||
                                 priceLoading ||
-                                !isHcaptchaVerified
+                                (!isHcaptchaVerified && price === 0)
                             "
                             dark
                             :loading="isLoading"
@@ -275,57 +275,54 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
                 this.errorMessage = error.message;
                 this.isLoading = false;
                 this.isError = true;
-                // return;
+                return;
             }
         }
 
-        // const bodyFormData = new FormData();
-        // bodyFormData.append(
-        //     'collectionConfig',
-        //     JSON.stringify(parsedData.collectionConfig)
-        // );
+        const bodyFormData = new FormData();
+        bodyFormData.append(
+            'collectionConfig',
+            JSON.stringify(parsedData.collectionConfig)
+        );
 
-        // bodyFormData.append(
-        //     'hcaptchaToken',
-        //     this.hcaptchaToken
-        // );
+        bodyFormData.append('hcaptchaToken', this.hcaptchaToken);
 
-        // for (const file of parsedData.files) {
-        //     bodyFormData.append('images', file);
-        // }
+        for (const file of parsedData.files) {
+            bodyFormData.append('images', file);
+        }
 
-        // try {
-        //     await this.$axios({
-        //         url: '/upload',
-        //         method: 'POST',
-        //         data: bodyFormData,
-        //         headers: { 'Content-Type': 'multipart/form-data' },
-        //     });
+        try {
+            await this.$axios({
+                url: '/upload',
+                method: 'POST',
+                data: bodyFormData,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
-        //     this.isLoading = false;
-        //     this.isSuccess = true;
+            this.isLoading = false;
+            this.isSuccess = true;
 
-        //     this.$gtag.event('collection_generate_confirm_success', {
-        //         ...this.syncedCollectionSettings,
-        //         num_layers: parsedData.collectionConfig.layersOrder.length,
-        //         num_traits: parsedData.files.length,
-        //     });
-        // } catch (err: any) {
-        //     if (err.response) {
-        //         this.errorMessage = err.response.data.response.errors.message;
-        //     } else {
-        //         this.errorMessage = 'Something went wrong 🤔. Try again later.';
-        //     }
+            this.$gtag.event('collection_generate_confirm_success', {
+                ...this.syncedCollectionSettings,
+                num_layers: parsedData.collectionConfig.layersOrder.length,
+                num_traits: parsedData.files.length,
+            });
+        } catch (err: any) {
+            if (err.response) {
+                this.errorMessage = err.response.data.response.errors.message;
+            } else {
+                this.errorMessage = 'Something went wrong 🤔. Try again later.';
+            }
 
-        //     this.isError = true;
-        //     this.isLoading = false;
-        //     this.$gtag.event('collection_generate_confirm_success', {
-        //         ...this.syncedCollectionSettings,
-        //         num_layers: parsedData.collectionConfig.layersOrder.length,
-        //         num_traits: parsedData.files.length,
-        //         error: err.message || err,
-        //     });
-        // }
+            this.isError = true;
+            this.isLoading = false;
+            this.$gtag.event('collection_generate_confirm_success', {
+                ...this.syncedCollectionSettings,
+                num_layers: parsedData.collectionConfig.layersOrder.length,
+                num_traits: parsedData.files.length,
+                error: err.message || err,
+            });
+        }
     }
 
     @Watch('collectionSettings', { immediate: true, deep: true })
