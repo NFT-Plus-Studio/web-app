@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="syncedShowModal" width="600">
-        <v-card light>
+        <v-card class="pa-5" light>
             <v-app-bar flat color="rgba(255, 255, 255, 0)">
                 <v-toolbar-title class="text-h6 pl-0">
                     Almost there!
@@ -74,19 +74,29 @@
                         ></v-text-field>
                     </div>
                     <div class="text-center">
-                        <p class="text-h6 font-weight-bold mb-1">Amount Due</p>
-                        <p class="text-body-2 font-weight-medium">
+                        <p class="text-body-2 font-weight-bold mb-1">
+                            Amount Due
+                        </p>
+                        <p
+                            class="
+                                text-h6
+                                font-weight-medium
+                                blue-grey--text
+                                text--lighten-1
+                            "
+                        >
                             {{ price }} BNB
                         </p>
                     </div>
                     <div class="d-flex justify-center">
                         <vue-hcaptcha
+                            ref="myHcaptcha"
                             sitekey="3355137f-7fb8-493b-8db5-46bcb103da35"
                             @verify="onHcaptchaVerify"
                             @reset="onHcaptchaReset"
                         ></vue-hcaptcha>
                     </div>
-                    <div class="d-flex flex-column justify-center">
+                    <div class="d-flex flex-column justify-center mt-3">
                         <v-btn
                             id="create-button"
                             type="submit"
@@ -97,7 +107,7 @@
                             "
                             dark
                             :loading="isLoading"
-                            class="py-5"
+                            class="py-6"
                             >Confirm</v-btn
                         >
                         <p
@@ -196,7 +206,6 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
     }
 
     onHcaptchaReset() {
-        console.log('onHcaptchaReset');
         this.isHcaptchaVerified = false;
         this.hcaptchaToken = '';
     }
@@ -344,6 +353,9 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         this.isError = false;
         this.isSuccess = false;
 
+        if (this.$refs.myHcaptcha) {
+            (<any>this.$refs.myHcaptcha).reset();
+        }
         this.fetchPrice();
     }
 }
