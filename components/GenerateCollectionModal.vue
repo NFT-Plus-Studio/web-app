@@ -79,11 +79,22 @@
                             {{ price }} BNB
                         </p>
                     </div>
+                    <div class="d-flex justify-center">
+                        <vue-hcaptcha
+                            sitekey="3355137f-7fb8-493b-8db5-46bcb103da35"
+                            @verify="onHcaptchaVerify"
+                            @reset="onHcaptchaReset"
+                        ></vue-hcaptcha>
+                    </div>
                     <div class="d-flex flex-column justify-center">
                         <v-btn
                             id="create-button"
                             type="submit"
-                            :disabled="!form.valid || priceLoading"
+                            :disabled="
+                                !form.valid ||
+                                priceLoading ||
+                                !isHcaptchaVerified
+                            "
                             dark
                             :loading="isLoading"
                             class="py-5"
@@ -105,6 +116,7 @@
 <script lang="ts">
 import { Component, PropSync, Watch, Mixins } from 'vue-property-decorator';
 import _ from 'underscore';
+import VueHcaptcha from '@hcaptcha/vue-hcaptcha';
 import { Collection } from '@/mixins/collection';
 import { debounce } from '@/helpers/utils';
 
@@ -154,7 +166,11 @@ interface Form extends FormDefinition {
     };
 }
 
-@Component
+@Component({
+    components: {
+        VueHcaptcha,
+    },
+})
 export default class GenerateCollectionModal extends Mixins(Collection) {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
     @PropSync('layerData', { type: Array }) syncedLayers!: any[];
@@ -166,6 +182,24 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
     isError: boolean = false;
     errorMessage: string = '';
     isSuccess: boolean = false;
+    hcaptchaToken: string = '';
+    isHcaptchaVerified: boolean = false;
+
+    get hCaptchaSiteKey(): string {
+        return process.env.NUXT_ENV_HCAPTCHA_SITE_KEY || '';
+    }
+
+    onHcaptchaVerify(token: string) {
+        this.isHcaptchaVerified = true;
+        this.hcaptchaToken = token;
+        console.log(this.hcaptchaToken);
+    }
+
+    onHcaptchaReset() {
+        console.log('onHcaptchaReset');
+        this.isHcaptchaVerified = false;
+        this.hcaptchaToken = '';
+    }
 
     price: number = 0;
     priceLoading: boolean = false;
@@ -240,6 +274,11 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         // bodyFormData.append(
         //     'collectionConfig',
         //     JSON.stringify(parsedData.collectionConfig)
+        // );
+
+        // bodyFormData.append(
+        //     'hcaptchaToken',
+        //     this.hcaptchaToken
         // );
 
         // for (const file of parsedData.files) {
