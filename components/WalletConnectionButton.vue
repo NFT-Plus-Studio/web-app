@@ -9,12 +9,12 @@
         </v-btn>
         <div v-else>
             <span id="wallet-address" class="mr-4">{{ truncatedAddress }}</span>
-            <v-btn
+            <!-- <v-btn
                 id="disconnect-wallet-btn"
                 class="py-5"
                 @click.stop="disconnectWallet"
                 >Disconnect</v-btn
-            >
+            > -->
         </div>
     </div>
 </template>
