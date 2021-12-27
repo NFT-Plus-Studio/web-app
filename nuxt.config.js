@@ -112,7 +112,7 @@ export default {
     css: [],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-    plugins: ['~/plugins/storage', '@/plugins/gtag'],
+    plugins: ['~/plugins/storage', '@/plugins/gtag', '@/plugins/web3'],
 
     // Auto import components: https://go.nuxtjs.dev/config-components
     components: true,
@@ -138,6 +138,7 @@ export default {
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
     axios: {
         baseURL: process.env.NUXT_ENV_API_URL,
+        credentials: false,
     },
 
     // PWA module configuration: https://go.nuxtjs.dev/pwa

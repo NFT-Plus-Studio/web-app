@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="syncedShowModal" width="600">
-        <v-card light>
+        <v-card class="pa-5" light>
             <v-app-bar flat color="rgba(255, 255, 255, 0)">
                 <v-toolbar-title class="text-h6 pl-0">
                     Almost there!
@@ -13,100 +13,110 @@
                 </v-btn>
             </v-app-bar>
             <div class="px-5 pb-4">
-                <v-alert
-                    v-if="isSuccess || isError"
-                    :type="isSuccess ? 'success' : 'error'"
-                    >{{
-                        isSuccess
-                            ? 'Awesome! You should receive an email shortly. 🥳'
-                            : errorMessage
-                    }}</v-alert
-                >
                 <v-form
                     ref="form"
                     v-model="form.valid"
                     @submit.prevent="onSubmit"
                 >
-                    <p class="grey--text">Collection Settings</p>
-                    <v-text-field
-                        v-model="syncedCollectionSettings.name"
-                        label="Title"
-                        :rules="form.rules.title"
-                        outlined
-                    ></v-text-field>
-                    <v-textarea
-                        v-model="syncedCollectionSettings.description"
-                        hide-details
-                        outlined
-                        rows="2"
-                        label="Description"
-                    ></v-textarea>
-                    <p class="mt-3 grey--text">Generate Settings</p>
-                    <v-text-field
-                        v-model="syncedCollectionSettings.emailAddress"
-                        label="Email"
-                        :rules="form.rules.email"
-                        outlined
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="syncedCollectionSettings.collectionSize"
-                        label="# of images to generate"
-                        :rules="form.rules.collectionSize"
-                        outlined
-                    ></v-text-field>
+                    <p class="grey--text mb-1 text-subtitle-2">
+                        Collection Settings
+                    </p>
+                    <div class="input-container">
+                        <label>Title</label>
+                        <v-text-field
+                            v-model="syncedCollectionSettings.name"
+                            dense
+                            type="text"
+                            :rules="form.rules.title"
+                            outlined
+                        ></v-text-field>
+                    </div>
+                    <div class="input-container">
+                        <label>Description</label>
+                        <v-textarea
+                            v-model="syncedCollectionSettings.description"
+                            hide-details
+                            outlined
+                            rows="2"
+                            type="text"
+                        ></v-textarea>
+                    </div>
+                    <p class="mt-3 grey--text mb-1 text-subtitle-2">
+                        Generate Settings
+                    </p>
+                    <div class="input-container">
+                        <label>Email</label>
+                        <v-text-field
+                            v-model="syncedCollectionSettings.emailAddress"
+                            type="text"
+                            dense
+                            :rules="form.rules.email"
+                            outlined
+                        ></v-text-field>
+                    </div>
+                    <div class="input-container">
+                        <label># of images to generate</label>
+                        <v-text-field
+                            v-model="syncedCollectionSettings.collectionSize"
+                            :rules="form.rules.collectionSize"
+                            dense
+                            outlined
+                            @keyup="processCollectionSizeChange"
+                        ></v-text-field>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-body-2 font-weight-bold mb-1">
+                            Amount Due
+                        </p>
+                        <p
+                            class="
+                                text-h6
+                                font-weight-medium
+                                blue-grey--text
+                                text--lighten-1
+                            "
+                        >
+                            {{ price }} BNB
+                        </p>
+                    </div>
+                    <v-alert
+                        v-if="isSuccess || isError"
+                        :type="isSuccess ? 'success' : 'error'"
+                        >{{
+                            isSuccess
+                                ? 'Awesome! You should receive an email shortly. 🥳'
+                                : errorMessage
+                        }}</v-alert
+                    >
+                    <div v-if="price == 0" class="d-flex justify-center">
+                        <vue-hcaptcha
+                            ref="myHcaptcha"
+                            sitekey="3355137f-7fb8-493b-8db5-46bcb103da35"
+                            @verify="onHcaptchaVerify"
+                            @reset="onHcaptchaReset"
+                        ></vue-hcaptcha>
+                    </div>
 
-                    <!-- <v-menu class="mb-5" offset-y light>
-                        <template #activator="{ on, attrs }">
-                            <v-btn
-                                block
-                                outlined
-                                class="py-6 mb-6"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                                <img
-                                    :src="selectedToken.iconPath"
-                                    width="16"
-                                    contain
-                                />
-                                {{ selectedToken.name }}
-                                <v-spacer></v-spacer>
-                                <v-icon right color="black">
-                                    mdi-menu-down
-                                </v-icon>
-                            </v-btn>
-                        </template>
-                        <v-card class="mx-auto" width="300" tile>
-                            <v-list class="px-20">
-                                <v-list-item-group v-model="selectedTokenIndex">
-                                    <v-list-item
-                                        v-for="(
-                                            token, index
-                                        ) in supportedTokens"
-                                        :key="index"
-                                    >
-                                        <v-list-item-icon> </v-list-item-icon>
-                                        <v-list-item-content>
-                                            <v-list-item-title>{{
-                                                token.name
-                                            }}</v-list-item-title>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-list-item-group>
-                            </v-list>
-                        </v-card>
-                    </v-menu> -->
-
-                    <div class="d-flex justify-center">
+                    <div class="d-flex flex-column justify-center mt-3">
                         <v-btn
                             id="create-button"
                             type="submit"
-                            :disabled="!form.valid"
+                            :disabled="
+                                !form.valid ||
+                                priceLoading ||
+                                (!isHcaptchaVerified && price === 0)
+                            "
                             dark
                             :loading="isLoading"
-                            class="py-5"
+                            class="py-6"
                             >Confirm</v-btn
                         >
+                        <p
+                            v-if="isWaitingForPayment"
+                            class="text-center mt-3 font-italic"
+                        >
+                            Waiting for payment...
+                        </p>
                     </div>
                 </v-form>
             </div>
@@ -115,10 +125,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { Component, PropSync, Watch, Mixins } from 'vue-property-decorator';
 import _ from 'underscore';
+import VueHcaptcha from '@hcaptcha/vue-hcaptcha';
 import { Collection } from '@/mixins/collection';
+import { debounce } from '@/helpers/utils';
 
 // TODO: move to mixin
 export interface FormDefinition {
@@ -166,31 +177,45 @@ interface Form extends FormDefinition {
     };
 }
 
-@Component
+@Component({
+    components: {
+        VueHcaptcha,
+    },
+})
 export default class GenerateCollectionModal extends Mixins(Collection) {
     @PropSync('showModal', { type: Boolean }) syncedShowModal!: boolean;
     @PropSync('layerData', { type: Array }) syncedLayers!: any[];
     @PropSync('collectionSettings', { type: Object })
     syncedCollectionSettings!: any;
 
-    supportedTokens = [
-        {
-            ticker: 'eth',
-            name: 'Ethereum',
-            network: 'ethereum',
-            iconPath: '~/assets/images/icons/eth-icon.svg',
-        },
-    ];
-
     selectedTokenIndex = 0;
     isLoading: boolean = false;
     isError: boolean = false;
     errorMessage: string = '';
     isSuccess: boolean = false;
+    hcaptchaToken: string = '';
+    isHcaptchaVerified: boolean = false;
+    txHash = '';
+    shouldRetry: boolean = false;
 
-    get selectedToken() {
-        return this.supportedTokens[this.selectedTokenIndex];
+    get hCaptchaSiteKey(): string {
+        return process.env.NUXT_ENV_HCAPTCHA_SITE_KEY || '';
     }
+
+    onHcaptchaVerify(token: string) {
+        this.isHcaptchaVerified = true;
+        this.hcaptchaToken = token;
+        console.log(this.hcaptchaToken);
+    }
+
+    onHcaptchaReset() {
+        this.isHcaptchaVerified = false;
+        this.hcaptchaToken = '';
+    }
+
+    price: number = 0;
+    priceLoading: boolean = false;
+    isWaitingForPayment: boolean = false;
 
     form: Form = {
         valid: false,
@@ -206,6 +231,22 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
             collectionSize: [requiredRule(), isNumber()],
         },
     };
+
+    processCollectionSizeChange = debounce(() => this.fetchPrice());
+
+    async fetchPrice() {
+        const asset = 'bnb';
+        this.priceLoading = true;
+        const url = `/pricing?amount=${this.syncedCollectionSettings.collectionSize}&asset=${asset}`;
+        try {
+            const response = await this.$axios.get(url);
+            this.price = response.data.data.price;
+            this.priceLoading = false;
+        } catch (error) {
+            console.log('error', error);
+            this.priceLoading = false;
+        }
+    }
 
     async onSubmit() {
         // reset
@@ -226,11 +267,30 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
             return;
         }
 
+        if (this.price > 0 && this.txHash == '' && !this.shouldRetry) {
+            try {
+                this.isWaitingForPayment = true;
+                this.txHash = await this.$web3.createDefaultChainPayment(
+                    this.price
+                );
+                console.log('Transaction Hash: ', this.txHash);
+            } catch (error: any) {
+                this.isWaitingForPayment = false;
+                this.errorMessage = error.message;
+                this.isLoading = false;
+                this.isError = true;
+                return;
+            }
+        }
+
         const bodyFormData = new FormData();
         bodyFormData.append(
             'collectionConfig',
             JSON.stringify(parsedData.collectionConfig)
         );
+
+        bodyFormData.append('hcaptchaToken', this.hcaptchaToken);
+        bodyFormData.append('txHash', this.txHash);
 
         for (const file of parsedData.files) {
             bodyFormData.append('images', file);
@@ -244,25 +304,41 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
+            // reset
             this.isLoading = false;
             this.isSuccess = true;
+            this.txHash = '';
+            this.shouldRetry = false;
+            this.isWaitingForPayment = false;
 
+            // save flag collection has been generated
+            this.$storage.collection.update({
+                collectionId: this.syncedCollectionSettings.id,
+                dataToUpdate: {
+                    hasGenerated: true,
+                },
+            });
+
+            // record successful collections
             this.$gtag.event('collection_generate_confirm_success', {
                 ...this.syncedCollectionSettings,
                 num_layers: parsedData.collectionConfig.layersOrder.length,
                 num_traits: parsedData.files.length,
             });
         } catch (err: any) {
-            console.log('Error requesting to generate collection: ', err);
-
             if (err.response) {
                 this.errorMessage = err.response.data.response.errors.message;
             } else {
                 this.errorMessage = 'Something went wrong 🤔. Try again later.';
             }
 
+            // reset
             this.isError = true;
             this.isLoading = false;
+            this.shouldRetry = true;
+            this.isWaitingForPayment = false;
+
+            // track failures
             this.$gtag.event('collection_generate_confirm_success', {
                 ...this.syncedCollectionSettings,
                 num_layers: parsedData.collectionConfig.layersOrder.length,
@@ -296,11 +372,19 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
         // reset stuff here
         this.isError = false;
         this.isSuccess = false;
+        this.shouldRetry = false;
+        this.txHash = '';
+
+        if (this.$refs.myHcaptcha) {
+            (<any>this.$refs.myHcaptcha).reset();
+        }
+
+        this.fetchPrice();
     }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #create-button {
     background: linear-gradient(
         180deg,
@@ -310,5 +394,14 @@ export default class GenerateCollectionModal extends Mixins(Collection) {
     border-radius: 6.27055px;
     transform: rotate(-0.42deg);
     font-size: 16px;
+}
+
+.input-container {
+    margin-bottom: 0.8em 0;
+    label {
+        color: black;
+        margin-bottom: 0.3em;
+        display: block;
+    }
 }
 </style>

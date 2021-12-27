@@ -8,6 +8,8 @@
                 ></v-img>
             </template>
             <ItemSettingsSelector />
+            <v-spacer></v-spacer>
+            <WalletConnectionButton />
         </v-app-bar>
         <v-main>
             <v-container fluid class="pt-11 pb-4 px-6 full-height-container">
