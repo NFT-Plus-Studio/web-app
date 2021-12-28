@@ -4,8 +4,8 @@ import { switchToPaymentNetwork } from '@/helpers/switchNetwork';
 const Web3 = require('web3');
 
 interface NFTStudioWeb3Props {
-    connect(store: any): Promise<boolean>;
-    disconnect(store: any): void;
+    connect(showAlertIfError: boolean): Promise<boolean>;
+    disconnect(): void;
     checkWrongPaymentNetwork(): Promise<boolean>;
     createDefaultChainPayment(amount: number): Promise<string>;
 }
@@ -59,7 +59,7 @@ class NFTStudioWeb3 implements NFTStudioWeb3Props {
         });
     }
 
-    async connect(): Promise<boolean> {
+    async connect(showAlertIfError = true): Promise<boolean> {
         const ethereum = (<any>window).ethereum;
         if (ethereum) {
             const connectedProvider = new Web3(ethereum);
@@ -86,9 +86,11 @@ class NFTStudioWeb3 implements NFTStudioWeb3Props {
         }
 
         // if no window.ethereum then MetaMask is not installed
-        alert(
-            'MetaMask is not installed. Please consider installing it: https://metamask.io/download.html'
-        );
+        if (showAlertIfError) {
+            alert(
+                'MetaMask is not installed. Please consider installing it: https://metamask.io/download.html'
+            );
+        }
         return false;
     }
 
@@ -140,7 +142,7 @@ class NFTStudioWeb3 implements NFTStudioWeb3Props {
 
 const web3Plugin: Plugin = (_context, inject) => {
     const web3 = new NFTStudioWeb3(_context.store);
-    web3.connect();
+    web3.connect(false);
 
     inject('web3', web3);
 };
