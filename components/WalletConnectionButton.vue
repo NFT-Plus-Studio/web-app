@@ -37,11 +37,11 @@ export default class WalletConnectionButton extends Vue {
     }
 
     connectWallet() {
-        this.$web3.connect(this.$store);
+        this.$web3.connect(true);
     }
 
     disconnectWallet() {
-        this.$web3.disconnect(this.$store);
+        this.$web3.disconnect();
     }
 }
 </script>
